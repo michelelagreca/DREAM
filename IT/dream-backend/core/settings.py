@@ -120,6 +120,14 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# PROJECT LEVEL PERMISSIONS
+# DOC: https://www.django-rest-framework.org/api-guide/permissions/#api-reference
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
