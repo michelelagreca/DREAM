@@ -37,8 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'forum',         # added
-    'forum_api'      # added
+    'forum',           # added
+    'forum_api',       # added
+    'rest_framework',  # added
 ]
 
 MIDDLEWARE = [
