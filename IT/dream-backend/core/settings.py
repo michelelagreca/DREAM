@@ -126,10 +126,17 @@ STATIC_URL = 'static/'
 
 # PROJECT LEVEL PERMISSIONS
 # DOC: https://www.django-rest-framework.org/api-guide/permissions/#api-reference
+# JWT CONFIGURATION
+# DOC https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ]
+        # 'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
 }
 
 # Default primary key field type
