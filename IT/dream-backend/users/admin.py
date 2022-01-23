@@ -6,8 +6,7 @@ from .models import CustomUser, Zone, District, AuthCodeFarmer, AuthCodeAgronomi
 
 @admin.register(CustomUser)
 class UserAdmin(admin.ModelAdmin):
-    # use this for custom view
-    pass
+    list_display = ('id', 'first_name', 'last_name', 'role', 'zone', 'district', 'is_active', 'auth_code', 'is_staff')
 
 
 @admin.register(District)
@@ -22,14 +21,14 @@ class ZoneAdmin(admin.ModelAdmin):
 
 @admin.register(AuthCodeFarmer)
 class AuthCodeFarmerAdmin(admin.ModelAdmin):
-    list_display = ('code', 'first_name', 'last_name', 'zone')
+    list_display = ('code', 'first_name', 'last_name', 'zone', 'isValid')
 
 
 @admin.register(AuthCodeAgronomist)
 class AuthCodeAgronomistAdmin(admin.ModelAdmin):
-    list_display = ('code', 'first_name', 'last_name', 'zone')
+    list_display = ('code', 'first_name', 'last_name', 'zone', 'isValid')
 
 
 @admin.register(AuthCodePolicyMaker)
 class AuthCodePolicyMakerAdmin(admin.ModelAdmin):
-    list_display = ('code', 'first_name', 'last_name', 'district')
+    list_display = ('code', 'first_name', 'last_name', 'district', 'isValid')
