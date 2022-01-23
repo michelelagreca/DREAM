@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'forum',           # added
     'forum_api',       # added
     'rest_framework',  # added
-    'corsheaders',      # added
+    'corsheaders',     # added
+    'users',           # added
 ]
 
 # cors setup here https://pypi.org/project/django-cors-headers/
@@ -126,10 +127,17 @@ STATIC_URL = 'static/'
 
 # PROJECT LEVEL PERMISSIONS
 # DOC: https://www.django-rest-framework.org/api-guide/permissions/#api-reference
+# JWT CONFIGURATION
+# DOC https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ]
+        # 'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
 }
 
 # Default primary key field type
@@ -142,3 +150,5 @@ CORS_ALLOWED_ORIGINS = [
     "https://example.com",
     "http://localhost:3000",
 ]
+
+AUTH_USER_MODEL = "users.CustomUser"
