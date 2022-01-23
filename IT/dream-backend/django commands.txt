@@ -22,3 +22,6 @@ pip install django-cors-headers
 pip install coverage
 coverage run --omit='*/venv/*' manage.py test
 coverage html
+
+**without venv
+python -m pip install djangorestframework-simplejwt
