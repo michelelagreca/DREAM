@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'forum',           # added
     'forum_api',       # added
+    'request',           # added
+    'request_api',       # added
     'rest_framework',  # added
     'corsheaders',      # added
 ]
