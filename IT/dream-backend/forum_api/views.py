@@ -1,6 +1,7 @@
+from urllib import response #added
 from rest_framework import generics
-from forum.models import Question, Category
-from .serializers import QuestionSerializer, CategorySerializer
+from forum.models import Question, Category, Tip
+from .serializers import QuestionSerializer, CategorySerializer, TipSerializer#, TipLikesSerializer, TipDislikesSerializer
 
 # import here all the needed DB models
 # from forum.models import MODEL_NAME
@@ -10,6 +11,11 @@ from .serializers import QuestionSerializer, CategorySerializer
 
 
 # ADD HERE GENERIC VIEW FOR DEBUGGING PORPOUSE, THEY ARE INCLUDED IN THE REST FRAMEWORK
+
+class CategoryList(generics.ListAPIView):
+    queryset = Category.categoryobjects.all()
+    serializer_class = CategorySerializer
+
 class QuestionList(generics.ListCreateAPIView):
     queryset = Question.questionobjects.all()
     serializer_class = QuestionSerializer
@@ -25,9 +31,35 @@ class QuestionDetail(generics.RetrieveUpdateDestroyAPIView):
 # PUT + parameter-> update the question denoted by the parameter
 # DELETE + parameter-> delete the question denoted by the parameter
 
-class CategoryList(generics.ListAPIView):
-    queryset = Category.categoryobjects.all()
-    serializer_class = CategorySerializer
+
+class TipList(generics.ListCreateAPIView):
+    queryset = Tip.tipobjects.all()
+    serializer_class = TipSerializer
+
+# GET -> list all tips
+# POST -> inserts a tips
+
+class TipDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Tip.objects.all()
+    serializer_class = TipSerializer
+
+# GET + parameter-> retireve a tip
+# PUT + parameter-> update the tip denoted by the parameter
+# DELETE + parameter-> delete the tip denoted by the parameter
+
+# class TipLike(generics.UpdateAPIView):
+#     queryset = Tip.objects.all()
+#     serializer_class = TipLikesSerializer
+
+#     def update(self, request, *args, **kwargs):
+#         data_to_change = {'likes': request.data.get("likes")}
+#         # Partial update of the data
+#         serializer = self.serializer_class(request.user, data=data_to_change, partial=True)
+#         if serializer.is_valid():
+#             self.perform_update(serializer)
+
+#         return response(serializer.data)
+
 
 """ Concrete View Classes
 #CreateAPIView

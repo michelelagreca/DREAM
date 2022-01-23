@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import QuestionList, QuestionDetail, CategoryList
+from .views import QuestionList, QuestionDetail, CategoryList, TipDetail, TipList
 
 app_name = 'forum_api' #changed
 
@@ -8,5 +8,9 @@ app_name = 'forum_api' #changed
 urlpatterns = [
     path('posting/question/<int:pk>/', QuestionDetail.as_view(), name='questiondetailcreate'),
     path('posting/question', QuestionList.as_view(), name='questionlistcreate'),
-    path('posting/category', CategoryList.as_view(), name='categorylist')
+    path('posting/category', CategoryList.as_view(), name='categorylist'),
+    path('posting/tip/<int:pk>/', TipDetail.as_view(), name='tipdetailcreate'),
+    path('posting/tip', TipList.as_view(), name='tiplistcreate'),
+    #path('voting/tip/like/<int:pk>', TipLike.as_view(), name='tiplike'),
+    #path('voting/tip/dislike/<int:pk>', TipDisike.as_view(), name='tipdislike')
 ]
