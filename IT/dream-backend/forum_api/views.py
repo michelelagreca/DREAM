@@ -1,6 +1,6 @@
 from rest_framework import generics
-from forum.models import Question
-from .serializers import QuestionSerializer
+from forum.models import Question, Category
+from .serializers import QuestionSerializer, CategorySerializer
 
 # import here all the needed DB models
 # from forum.models import MODEL_NAME
@@ -10,14 +10,24 @@ from .serializers import QuestionSerializer
 
 
 # ADD HERE GENERIC VIEW FOR DEBUGGING PORPOUSE, THEY ARE INCLUDED IN THE REST FRAMEWORK
-class PostList(generics.ListCreateAPIView):
+class QuestionList(generics.ListCreateAPIView):
     queryset = Question.questionobjects.all()
     serializer_class = QuestionSerializer
 
+# GET -> list all questions
+# POST -> inserts a question
 
-class PostDetail(generics.RetrieveUpdateDestroyAPIView):
+class QuestionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
+
+# GET + parameter-> retireve a question
+# PUT + parameter-> update the question denoted by the parameter
+# DELETE + parameter-> delete the question denoted by the parameter
+
+class CategoryList(generics.ListAPIView):
+    queryset = Category.categoryobjects.all()
+    serializer_class = CategorySerializer
 
 """ Concrete View Classes
 #CreateAPIView
