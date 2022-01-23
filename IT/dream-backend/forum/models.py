@@ -1,3 +1,4 @@
+from email.policy import default
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -43,3 +44,28 @@ class Question(models.Model):
     def __str__(self):
         return self.title
 
+class Tip(models.Model):
+
+    class TipObjects(models.Manager):
+        def get_queryset(self):
+            return super().get_queryset()
+
+    timestamp = models.DateTimeField(default=timezone.now)
+    title = models.CharField(max_length=250)
+    text_body = models.TextField()
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='forum_Tips')
+    category = models.ForeignKey(
+        Category, on_delete=models.PROTECT, default='1')
+    area = models.CharField(max_length=250, default='area')
+    likes = models.IntegerField(default=0)
+    dislikes = models.IntegerField(default=0)
+    is_star = models.BooleanField()
+    objects = models.Manager()
+    tipobjects = TipObjects()
+
+    class Meta:
+        ordering = ('-timestamp',)
+
+    def __str__(self):
+        return self.title

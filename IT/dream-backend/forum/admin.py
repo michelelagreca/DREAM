@@ -10,3 +10,7 @@ class AuthorAdmin(admin.ModelAdmin):
 
 
 admin.site.register(models.Category)
+
+@admin.register(models.Tip)
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'author', 'category', 'area', 'likes', 'dislikes', 'is_star') #it is the field that appears in the admin list of tips
