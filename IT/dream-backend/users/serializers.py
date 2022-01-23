@@ -93,6 +93,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
             auth_code=validated_data['auth_code'],
             role=validated_data['role'],
             user_name=validated_data['user_name'],
+            is_active=True,     # the user is activated immediately, change here if needed
             **geo_args
         )
 
