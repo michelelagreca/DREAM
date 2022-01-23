@@ -6,8 +6,7 @@ from . import models
 # add possibility in admin console to create new models
 @admin.register(models.Question)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('title', 'id', 'status', 'slug', 'author')
-    prepopulated_fields = {'slug': ('title',), }
+    list_display = ('id', 'title', 'author', 'category', 'area') #it is the field that appears in the admin list of questions
 
 
 admin.site.register(models.Category)

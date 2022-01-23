@@ -7,6 +7,14 @@ from django.utils import timezone
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
+    class CategoryObjects(models.Manager):
+        def get_queryset(self):
+            return super().get_queryset()
+    
+    objects = models.Manager()
+    categoryobjects = CategoryObjects()
+    class Meta:
+        verbose_name_plural = "categories"
 
     def __str__(self):
         return self.name
@@ -16,29 +24,21 @@ class Question(models.Model):
 
     class QuestionObjects(models.Manager):
         def get_queryset(self):
-            return super().get_queryset() .filter(status='published')
+            return super().get_queryset()
 
-    options = (
-        ('draft', 'Draft'),
-        ('published', 'Published'),
-    )
-
-    category = models.ForeignKey(
-        Category, on_delete=models.PROTECT, default=1)
+    timestamp = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=250)
-    excerpt = models.TextField(null=True)
-    content = models.TextField()
-    slug = models.SlugField(max_length=250, unique_for_date='published')
-    published = models.DateTimeField(default=timezone.now)
+    text_body = models.TextField()
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='forum_Questions')
-    status = models.CharField(
-        max_length=10, choices=options, default='published')
-    objects = models.Manager()  # default manager
-    questionobjects = QuestionObjects()  # custom manager
+    category = models.ForeignKey(
+        Category, on_delete=models.PROTECT, default='1')
+    area = models.CharField(max_length=250, default='area')
+    objects = models.Manager()
+    questionobjects = QuestionObjects()
 
     class Meta:
-        ordering = ('-published',)
+        ordering = ('-timestamp',)
 
     def __str__(self):
         return self.title
