@@ -10,3 +10,9 @@ urlpatterns = [
     # path('', include('forum.urls', namespace='forum')),
     path('api/', include('forum_api.urls', namespace='forum_api')),
 ]
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    # path('', include('report.urls', namespace='report')),
+    path('api/', include('report_api.urls', namespace='report_api')),
+]

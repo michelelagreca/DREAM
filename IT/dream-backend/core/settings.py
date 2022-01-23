@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
+import sys
+sys.dont_write_bytecode = True
 
 from pathlib import Path
 
@@ -37,9 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',  # added
     'forum',           # added
     'forum_api',       # added
-    'rest_framework',  # added
+    'report',           # added
+    'report_api',       # added
     'corsheaders',      # added
 ]
 

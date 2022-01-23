@@ -19,6 +19,7 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
 
+
 """ Concrete View Classes
 #CreateAPIView
 Used for create-only endpoints.

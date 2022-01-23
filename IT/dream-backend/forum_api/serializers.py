@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework import serializers
 from forum.models import Question
+from report.models import HarvestReport
 
 
 # Serializers are used to bind routes together with data from the DB
@@ -10,4 +11,9 @@ from forum.models import Question
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
+        fields = ('id', 'title', 'author', 'excerpt', 'content', 'status')
+
+class QuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HarvestReport
         fields = ('id', 'title', 'author', 'excerpt', 'content', 'status')
