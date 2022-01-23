@@ -14,6 +14,9 @@ urlpatterns = [
     # path('', include('forum.urls', namespace='forum')),
     path('api/', include('forum_api.urls', namespace='forum_api')),
 
+    # This is the endpoint to connect to user app
+    path('api/user/', include('users.urls', namespace='users')),
+
     # This are the endpoints to get the tokens
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
