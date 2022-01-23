@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'forum',           # added
     'forum_api',       # added
     'rest_framework',  # added
-    'corsheaders',      # added
+    'corsheaders',     # added
+    'users',           # added
 ]
 
 # cors setup here https://pypi.org/project/django-cors-headers/
@@ -149,3 +150,5 @@ CORS_ALLOWED_ORIGINS = [
     "https://example.com",
     "http://localhost:3000",
 ]
+
+AUTH_USER_MODEL = "users.CustomUser"
