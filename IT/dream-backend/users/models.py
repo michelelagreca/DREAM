@@ -10,11 +10,17 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 class District(models.Model):
     name = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.name
+
 
 # zone definition
 class Zone(models.Model):
     name = models.CharField(max_length=50)
     district = models.ForeignKey(District, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.name
 
 
 # auth code definition
