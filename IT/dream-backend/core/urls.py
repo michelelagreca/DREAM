@@ -10,5 +10,5 @@ urlpatterns = [
     # path('', include('forum.urls', namespace='forum')),
     path('api/', include('forum_api.urls', namespace='forum_api')),
     # path('', include('request.urls', namespace='request')),
-    path('api/', include('request_api.urls', namespace='request_api')),
+    path('api/request', include('request_api.urls', namespace='request_api')),
 ]

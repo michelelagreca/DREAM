@@ -6,6 +6,6 @@ from . import models
 # add possibility in admin console to create new models
 @admin.register(models.HelpRequest)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('title', 'content', 'status', 'slug', 'author')
+    list_display = ('title', 'content', 'status', 'slug')
     prepopulated_fields = {'slug': ('title',), }
 

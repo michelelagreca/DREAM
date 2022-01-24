@@ -20,16 +20,16 @@ class HelpRequest(models.Model):
     content = models.TextField()
     slug = models.SlugField(max_length=250, unique_for_date='published')
     published = models.DateTimeField(default=timezone.now)
-    author = models.ForeignKey(
-        User, on_delete=models.PROTECT, related_name='request_HelpRequest')
+    # author = models.ForeignKey(
+    #     User, on_delete=models.PROTECT, related_name='request_HelpRequest')
     #RECEIVER
-    receiver = models.ForeignKey(
-        User, on_delete=models.PROTECT, related_name='request_HelpRequest')
+    # receiver = models.ForeignKey(
+    #     User, on_delete=models.PROTECT, related_name='request_HelpRequest')
 
     status = models.CharField(
         max_length=10, choices=options, default='published')
-    objects = models.Manager()  # default manager
-    hrobjects = HRObjects()  # custom manager
+    #objects = models.Manager()  # default manager
+    #hrobjects = HRObjects()  # custom manager
 
     class Meta:
         ordering = ('-published',)

@@ -13,14 +13,14 @@ from .serializers import HRSerializer
 
 # ADD HERE GENERIC VIEW FOR DEBUGGING PORPOUSE, THEY ARE INCLUDED IN THE REST FRAMEWORK
 class RequestList(generics.ListCreateAPIView):
-    queryset = HelpRequest.hrobjects.all()
-    serializer_class = HRSerializer
-
+    # queryset = HelpRequest.hrobjects.all()
+    # serializer_class = HRSerializer
+    pass
 
 class RequestDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = HelpRequest.objects.all()
-    serializer_class = HRSerializer
-
+    # queryset = HelpRequest.objects.all()
+    # serializer_class = HRSerializer
+    pass
 """ Concrete View Classes
 #CreateAPIView
 Used for create-only endpoints.
