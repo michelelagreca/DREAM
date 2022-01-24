@@ -7,14 +7,7 @@ import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/mater
 // components
 import Logo from "../../Logo";
 import Scrollbar from '../../Scrollbar';
-import NavSection from '../../NavSection';
 import { MHidden } from '../../@material-extend';
-//
-import sideBarAgronomist from './SideBarAgronomist';
-import sidebarPolicyMaker from "./SidebarPolicyMaker";
-import sidebarFarmer from "./SidebarFarmer";
-import sidebarAnonymous from "./SidebarAnonymous";
-
 // fake name to substitute with username
 import account from '../../../../_mocks_/account';
 import SidebarFarmer from "./SidebarFarmer";
