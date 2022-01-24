@@ -54,9 +54,9 @@ class RegistrationSerializer(serializers.ModelSerializer):
         if data['role'] == roles[0]:
             try:
                 auth_code_object = AuthCodeFarmer.objects.get(pk=data['auth_code'])
-                checkUserAuthCode(user_data=data, code_object=auth_code_object) # assign auth code zone to farmer
-                data['zone'] = auth_code_object.zone
-                data['district'] = auth_code_object.zone.district
+                checkUserAuthCode(user_data=data, code_object=auth_code_object) # assign auth code area to farmer
+                data['area'] = auth_code_object.area
+                data['district'] = auth_code_object.area.district
             except AuthCodeFarmer.DoesNotExist:
                 raise serializers.ValidationError("Invalid farmer authorization code")
 
@@ -78,10 +78,10 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        # dynamically create district/zone field based on the user type
+        # dynamically create district/area field based on the user type
         geo_args = {}
         if validated_data['role'] == 'farmer':
-            geo_args = {'zone': validated_data['zone'], 'district': validated_data['district']}
+            geo_args = {'area': validated_data['area'], 'district': validated_data['district']}
         elif validated_data['role'] == 'policymaker':
             geo_args = {'district': validated_data['district']}
 

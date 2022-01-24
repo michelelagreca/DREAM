@@ -1,7 +1,7 @@
 # Harvest_report
 from django.db import models
 from django.utils import timezone
-from users.models import CustomUser, Zone
+from users.models import CustomUser, Area
 from forum.models import Category
 
 # Create your models here.
@@ -20,8 +20,8 @@ class HarvestReport(models.Model):
     firstName = models.CharField(max_length=50)
     lastName = models.CharField(max_length=50)
     date = models.DateTimeField()
-    zone = models.ForeignKey(
-        Zone, on_delete=models.PROTECT, default=1)
+    area = models.ForeignKey(
+        Area, on_delete=models.PROTECT, default=1)
 
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, default=1)
@@ -41,6 +41,3 @@ class HarvestReport(models.Model):
 
     class Meta:
         ordering = ('-published',)
-
-    def __str__(self):
-        return self

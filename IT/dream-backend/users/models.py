@@ -14,8 +14,8 @@ class District(models.Model):
         return self.name
 
 
-# zone definition
-class Zone(models.Model):
+# area definition
+class Area(models.Model):
     name = models.CharField(max_length=50)
     district = models.ForeignKey(District, on_delete=models.PROTECT)
 
@@ -28,7 +28,7 @@ class AuthCodeFarmer(models.Model):
     code = models.CharField(max_length=30, primary_key=True)
     first_name = models.CharField(max_length=150, blank=False)
     last_name = models.CharField(max_length=150, blank=False)
-    zone = models.ForeignKey(Zone, on_delete=models.PROTECT)
+    area = models.ForeignKey(Area, on_delete=models.PROTECT)
     isValid = models.BooleanField(blank=False, default=True)
 
     def __str__(self):
@@ -39,7 +39,7 @@ class AuthCodeAgronomist(models.Model):
     code = models.CharField(max_length=30, primary_key=True)
     first_name = models.CharField(max_length=150, blank=False)
     last_name = models.CharField(max_length=150, blank=False)
-    zone = models.ForeignKey(Zone, on_delete=models.PROTECT)
+    area = models.ForeignKey(Area, on_delete=models.PROTECT)
     isValid = models.BooleanField(blank=False, default=True)
 
     def __str__(self):
@@ -119,7 +119,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     start_date = models.DateTimeField(default=timezone.now)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)  # if not active cannot receive tokens
-    zone = models.ForeignKey(Zone, on_delete=models.PROTECT, blank=True, null=True)
+    area = models.ForeignKey(Area, on_delete=models.PROTECT, blank=True, null=True)
     district = models.ForeignKey(District, on_delete=models.PROTECT, null=True)
     role = models.CharField(max_length=20, blank=False, default='no role')
 
