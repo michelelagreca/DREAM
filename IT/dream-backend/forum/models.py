@@ -2,9 +2,10 @@ from email.policy import default
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-
+from users.models import CustomUser
 
 # Forum Model definition
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -31,18 +32,19 @@ class Question(models.Model):
     title = models.CharField(max_length=250)
     text_body = models.TextField()
     author = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name='forum_Questions')
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, default='1')
     area = models.CharField(max_length=250, default='area')
     objects = models.Manager()
     questionobjects = QuestionObjects()
-        User, on_delete=models.CASCADE, related_name='forum_Questions')
 
     class Meta:
         ordering = ('-timestamp',)
 
     def __str__(self):
         return self.title
+
 
 class Tip(models.Model):
 
@@ -54,7 +56,7 @@ class Tip(models.Model):
     title = models.CharField(max_length=250)
     text_body = models.TextField()
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='forum_Tips')
+        CustomUser, on_delete=models.CASCADE, related_name='forum_Tips')
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, default='1')
     area = models.CharField(max_length=250, default='area')
