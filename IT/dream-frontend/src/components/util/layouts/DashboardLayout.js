@@ -1,11 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import { Outlet } from 'react-router-dom';
-// material
 import { styled } from '@mui/material/styles';
-//
 import DashboardNavbar from './rootStructure/DashboardNavbar';
 import DashboardSidebar from './rootStructure/DashboardSidebar';
-import NotificationsPopover from "./rootStructure/NotificationsPopover";
 
 // ----------------------------------------------------------------------
 
