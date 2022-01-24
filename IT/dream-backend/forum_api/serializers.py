@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from forum.models import Question, Category, Tip
+from forum.models import Question, Category, Tip, Answer
 
 
 # Serializers are used to bind routes together with data from the DB
@@ -28,6 +28,12 @@ class TipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tip
         fields = ('id', 'timestamp', 'title', 'text_body', 'author', 'category', 'area', 'likes', 'dislikes', 'is_star')
+
+
+class AnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        fields = ('id', 'timestamp', 'question', 'text_body', 'author', 'likes', 'dislikes')
 
 # class TipLikesSerializer(serializers.ModelSerializer):
 #     class Meta:

@@ -73,3 +73,26 @@ class Tip(models.Model):
 
     def __str__(self):
         return self.title
+
+class Answer(models.Model):
+
+    class AnswerObjects(models.Manager):
+        def get_queryset(self):
+            return super().get_queryset()
+
+    timestamp = models.DateTimeField(default=timezone.now)
+    question = models.ForeignKey(
+        Question, on_delete=models.CASCADE)
+    text_body = models.TextField()
+    author = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name='forum_Answers')
+    likes = models.IntegerField(default=0)
+    dislikes = models.IntegerField(default=0)
+    objects = models.Manager()
+    answerobjects = AnswerObjects()
+
+    class Meta:
+        ordering = ('-timestamp',)
+
+    # def __str__(self):
+    #     return self.title

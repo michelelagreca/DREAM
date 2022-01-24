@@ -1,7 +1,7 @@
 from urllib import response #added
 from rest_framework import generics
-from forum.models import Question, Category, Tip
-from .serializers import QuestionSerializer, CategorySerializer, TipSerializer#, TipLikesSerializer, TipDislikesSerializer
+from forum.models import Question, Category, Tip, Answer
+from .serializers import QuestionSerializer, CategorySerializer, TipSerializer, AnswerSerializer#, TipLikesSerializer, TipDislikesSerializer
 
 # import here all the needed DB models
 # from forum.models import MODEL_NAME
@@ -47,6 +47,14 @@ class TipDetail(generics.RetrieveUpdateDestroyAPIView):
 # PUT + parameter-> update the tip denoted by the parameter
 # DELETE + parameter-> delete the tip denoted by the parameter
 
+class AnswerList(generics.ListCreateAPIView):
+    queryset = Answer.answerobjects.all()
+    serializer_class = AnswerSerializer
+
+class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Answer.objects.all()
+    serializer_class = AnswerSerializer
+
 # class TipLike(generics.UpdateAPIView):
 #     queryset = Tip.objects.all()
 #     serializer_class = TipLikesSerializer
@@ -59,7 +67,6 @@ class TipDetail(generics.RetrieveUpdateDestroyAPIView):
 #             self.perform_update(serializer)
 
 #         return response(serializer.data)
-
 
 """ Concrete View Classes
 #CreateAPIView
