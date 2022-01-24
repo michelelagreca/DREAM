@@ -2,7 +2,7 @@ from email.policy import default
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-from users.models import CustomUser
+from users.models import CustomUser, Area
 
 # Forum Model definition
 
@@ -35,7 +35,8 @@ class Question(models.Model):
         CustomUser, on_delete=models.CASCADE, related_name='forum_Questions')
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, default='1')
-    area = models.CharField(max_length=250, default='area')
+    area = models.ForeignKey(
+        Area, on_delete=models.PROTECT, default=1)
     objects = models.Manager()
     questionobjects = QuestionObjects()
 
@@ -59,7 +60,8 @@ class Tip(models.Model):
         CustomUser, on_delete=models.CASCADE, related_name='forum_Tips')
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, default='1')
-    area = models.CharField(max_length=250, default='area')
+    area = models.ForeignKey(
+        Area, on_delete=models.PROTECT, default=1)
     likes = models.IntegerField(default=0)
     dislikes = models.IntegerField(default=0)
     is_star = models.BooleanField()
