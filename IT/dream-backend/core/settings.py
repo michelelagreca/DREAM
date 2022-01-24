@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'forum_api',       # added
     'report',           # added
     'report_api',       # added
+    'request',           # added
+    'request_api',       # added
     'corsheaders',      # added
     'users',           # added
     'rest_framework_simplejwt.token_blacklist',  # added
