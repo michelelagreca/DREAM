@@ -35,10 +35,13 @@ class HarvestReport(models.Model):
     date = models.DateTimeField()
     zone = models.ForeignKey(
         Zone, on_delete=models.PROTECT, default=1)
-    cropName = models.CharField(max_length=50)
-    quantity = models.FloatField()
+    
     cropCategory = models.ForeignKey(
         CropCategory, on_delete=models.PROTECT, default=1)
+    cropName = models.CharField(max_length=50)
+    quantity = models.FloatField()
+    genericProblems = models.CharField(max_length=500)
+    weatherProblems = models.CharField(max_length=500)
 
     slug = models.SlugField(max_length=250, unique_for_date='published')
     published = models.DateTimeField(default=timezone.now)
