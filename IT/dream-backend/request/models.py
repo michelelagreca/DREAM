@@ -15,15 +15,16 @@ class HelpRequest(models.Model):
         ('published', 'Published'),
     )
 
+
     title = models.CharField(max_length=250)
     content = models.TextField()
     slug = models.SlugField(max_length=250, unique_for_date='published')
     published = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(
-        User, on_delete=models.SET_NULL, related_name='request_HelpRequest')
+        User, on_delete=models.PROTECT, related_name='request_HelpRequest')
     #RECEIVER
     receiver = models.ForeignKey(
-        User, on_delete=models.SET_NULL, related_name='request_HelpRequest')
+        User, on_delete=models.PROTECT, related_name='request_HelpRequest')
 
     status = models.CharField(
         max_length=10, choices=options, default='published')

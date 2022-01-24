@@ -1,8 +1,8 @@
 from django.shortcuts import render
 
 from rest_framework import generics
-from forum.models import Question
-from .serializers import QuestionSerializer
+from request.models import HelpRequest
+from .serializers import HRSerializer
 
 # import here all the needed DB models
 # from forum.models import MODEL_NAME

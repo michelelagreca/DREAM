@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from forum.models import HelpRequest
+from request.models import HelpRequest
 
 
 # Serializers are used to bind routes together with data from the DB
