@@ -35,17 +35,26 @@ class AnswerSerializer(serializers.ModelSerializer):
         model = Answer
         fields = ('id', 'timestamp', 'question', 'text_body', 'author', 'likes', 'dislikes')
 
-# class TipLikesSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Tip
-#         fields = ('likes',)
+class TipLikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tip
+        fields = ('likes',)
 
-#     def update(self, instance, validated_data): 
-#         instance.likes = validated_data.get('likes', instance.likes)
-#         instance.save()
-#         return instance
 
-# class TipDislikesSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Tip
-#         fields = ('dislikes',)
+class AnswerLikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        fields = ('likes',)
+
+
+class TipDislikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tip
+        fields = ('dislikes',)
+
+
+class AnswerDislikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        fields = ('dislikes',)
+

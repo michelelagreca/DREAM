@@ -1,7 +1,9 @@
-from urllib import response #added
+from rest_framework.response import Response
 from rest_framework import generics
 from forum.models import Question, Category, Tip, Answer
-from .serializers import QuestionSerializer, CategorySerializer, TipSerializer, AnswerSerializer#, TipLikesSerializer, TipDislikesSerializer
+from .serializers import AnswerDislikeSerializer, AnswerLikeSerializer, QuestionSerializer, CategorySerializer, TipDislikeSerializer, TipLikeSerializer, TipSerializer, AnswerSerializer
+from django.db.models import F
+
 
 # import here all the needed DB models
 # from forum.models import MODEL_NAME
@@ -15,6 +17,9 @@ from .serializers import QuestionSerializer, CategorySerializer, TipSerializer, 
 class CategoryList(generics.ListAPIView):
     queryset = Category.categoryobjects.all()
     serializer_class = CategorySerializer
+
+# GET -> list all categories
+
 
 class QuestionList(generics.ListCreateAPIView):
     queryset = Question.questionobjects.all()
@@ -55,18 +60,51 @@ class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
 
-# class TipLike(generics.UpdateAPIView):
-#     queryset = Tip.objects.all()
-#     serializer_class = TipLikesSerializer
+class TipLike(generics.RetrieveAPIView):
+    queryset = Tip.objects.all()
+    serializer_class = TipLikeSerializer
 
-#     def update(self, request, *args, **kwargs):
-#         data_to_change = {'likes': request.data.get("likes")}
-#         # Partial update of the data
-#         serializer = self.serializer_class(request.user, data=data_to_change, partial=True)
-#         if serializer.is_valid():
-#             self.perform_update(serializer)
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        Tip.objects.filter(pk=instance.id).update(likes=F('likes') + 1)
+        instance.refresh_from_db() 
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
-#         return response(serializer.data)
+class AnswerLike(generics.RetrieveAPIView):
+    queryset = Answer.objects.all()
+    serializer_class = AnswerLikeSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        Answer.objects.filter(pk=instance.id).update(likes=F('likes') + 1)
+        instance.refresh_from_db() 
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+
+class TipDislike(generics.RetrieveAPIView):
+    queryset = Tip.objects.all()
+    serializer_class = TipDislikeSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        Tip.objects.filter(pk=instance.id).update(dislikes=F('dislikes') + 1)
+        instance.refresh_from_db() 
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+class AnswerDislike(generics.RetrieveAPIView):
+    queryset = Answer.objects.all()
+    serializer_class = AnswerDislikeSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        Answer.objects.filter(pk=instance.id).update(dislikes=F('dislikes') + 1)
+        instance.refresh_from_db() 
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
 
 """ Concrete View Classes
 #CreateAPIView
