@@ -10,7 +10,7 @@ from forum.models import Question, Category, Tip, Answer
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('name',)
+        fields = ('id', 'name')
     
 
 class QuestionSerializer(serializers.ModelSerializer):

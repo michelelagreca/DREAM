@@ -52,13 +52,51 @@ class TipDetail(generics.RetrieveUpdateDestroyAPIView):
 # PUT + parameter-> update the tip denoted by the parameter
 # DELETE + parameter-> delete the tip denoted by the parameter
 
+class TipListCategory(generics.ListAPIView):
+    serializer_class = TipSerializer
+
+    def get_queryset(self):
+        category = self.kwargs['category']
+        return Tip.objects.filter(category=category)
+
+# GET + category-> retireve a tip of a specific category
+
+
+class TipListArea(generics.ListAPIView):
+    serializer_class = TipSerializer
+
+    def get_queryset(self):
+        area = self.kwargs['area']
+        return Tip.objects.filter(area=area)
+
+# GET + area-> retireve a tip of a specific area
+
+
 class AnswerList(generics.ListCreateAPIView):
     queryset = Answer.answerobjects.all()
     serializer_class = AnswerSerializer
 
+# GET -> list all answers
+# POST -> inserts a answer
+
+
 class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
+
+# GET + parameter-> retireve a answer
+# PUT + parameter-> update the answer denoted by the parameter
+# DELETE + parameter-> delete the answer denoted by the parameter
+
+class AnswerListQuestion(generics.ListAPIView):
+    serializer_class = AnswerSerializer
+
+    def get_queryset(self):
+        question = self.kwargs['question']
+        return Answer.objects.filter(question=question)
+
+# GET + question-> retrieve all answer of a specific question
+
 
 class TipLike(generics.RetrieveAPIView):
     queryset = Tip.objects.all()

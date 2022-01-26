@@ -5,7 +5,9 @@ from . import models
 # This part deals with what can be seen from the admin administration portal
 # add possibility in admin console to create new models
 
-admin.site.register(models.Category)
+@admin.register(models.Category)
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
 
 @admin.register(models.Question)
 class AuthorAdmin(admin.ModelAdmin):

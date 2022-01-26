@@ -8,11 +8,10 @@ from users.models import CustomUser, Area
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
     class CategoryObjects(models.Manager):
         def get_queryset(self):
             return super().get_queryset()
-    
+    name = models.CharField(max_length=100)
     objects = models.Manager()
     categoryobjects = CategoryObjects()
     class Meta:
