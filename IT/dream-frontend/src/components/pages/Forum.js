@@ -11,6 +11,8 @@ import POSTS from '../.././_mocks_/blog';
 import React, {useState} from "react";
 import { useFormik } from 'formik';
 import {ProductFilterSidebar} from "../util/_dashboard/products";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import CircularProgressCenter from "../molecules/CircularProgressCenter";
 
 
 // ----------------------------------------------------------------------
@@ -96,6 +98,7 @@ export default function Forum({writeQ = false, writeT = false, ShowQ = false,Ans
             />
             <BlogPostsSort options={SORT_OPTIONS} onSort={setPostType} value={postType}/>
           </Stack>
+          <CircularProgressCenter isLoading={true}/>
           <Grid container spacing={3}>
             {postType === 'Posts' ?
                 POSTS.map((post, index) => (
