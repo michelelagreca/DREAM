@@ -11,11 +11,10 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('name',)
-    
+
 
 class QuestionSerializer(serializers.ModelSerializer):
-    
-    #category = serializers.SerializerMethodField()
+    # category = serializers.SerializerMethodField()
     class Meta:
         model = Question
         fields = ('id', 'timestamp', 'title', 'text_body', 'author', 'category', 'area')
@@ -23,6 +22,14 @@ class QuestionSerializer(serializers.ModelSerializer):
     # def get_category(self, category):
     #       return category.category.name 
     # this was to show the name of the category in the json, instead of the number referring the id
+
+
+# custom serializer to handle post json of vote request
+class TipVoteSerializer(serializers.Serializer):
+    tip_id = serializers.IntegerField()
+    is_like = serializers.BooleanField()
+    # call is_valid() to see if this fields are respected
+
 
 class TipSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,6 +41,7 @@ class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         fields = ('id', 'timestamp', 'question', 'text_body', 'author', 'likes', 'dislikes')
+
 
 class TipLikeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -57,4 +65,3 @@ class AnswerDislikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         fields = ('dislikes',)
-
