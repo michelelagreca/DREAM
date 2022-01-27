@@ -28,8 +28,10 @@ class QuestionSerializer(serializers.ModelSerializer):
 # custom serializer to handle post json of vote request
 class TipVoteSerializer(serializers.Serializer):
     tip_id = serializers.IntegerField()
-    is_like = serializers.BooleanField()
-    # call is_valid() to see if this fields are respected
+
+
+class AnswerVoteSerializer(serializers.Serializer):
+    answer_id = serializers.IntegerField()
 
 
 class TipSerializer(serializers.ModelSerializer):

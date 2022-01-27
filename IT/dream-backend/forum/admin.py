@@ -21,4 +21,4 @@ class AuthorAdmin(admin.ModelAdmin):
 
 @admin.register(models.Answer)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('id', 'question', 'author', 'likes', 'dislikes')
+    list_display = ('id', 'question', 'author',)
