@@ -4,17 +4,20 @@ from django.conf import settings
 from django.utils import timezone
 from users.models import CustomUser, Area
 
+
 # Forum Model definition
 
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
+
     class CategoryObjects(models.Manager):
         def get_queryset(self):
             return super().get_queryset()
-    
+
     objects = models.Manager()
     categoryobjects = CategoryObjects()
+
     class Meta:
         verbose_name_plural = "categories"
 
@@ -23,7 +26,6 @@ class Category(models.Model):
 
 
 class Question(models.Model):
-
     class QuestionObjects(models.Manager):
         def get_queryset(self):
             return super().get_queryset()
@@ -48,7 +50,6 @@ class Question(models.Model):
 
 
 class Tip(models.Model):
-
     class TipObjects(models.Manager):
         def get_queryset(self):
             return super().get_queryset()
@@ -74,8 +75,8 @@ class Tip(models.Model):
     def __str__(self):
         return self.title
 
-class Answer(models.Model):
 
+class Answer(models.Model):
     class AnswerObjects(models.Manager):
         def get_queryset(self):
             return super().get_queryset()

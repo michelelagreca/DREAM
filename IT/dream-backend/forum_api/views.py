@@ -107,6 +107,7 @@ def tip_like(request):
     """
     try:
         tip = Tip.objects.get(pk=tip_id)
+
     except Tip.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(data="Like sent", status=status.HTTP_200_OK)
