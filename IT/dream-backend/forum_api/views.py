@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import generics, status
 from forum.models import Question, Category, Tip, Answer
 from .serializers import AnswerDislikeSerializer, AnswerLikeSerializer, QuestionSerializer, CategorySerializer, \
-    TipDislikeSerializer, TipLikeSerializer, TipSerializer, AnswerSerializer, TipVoteSerializer
+    TipDislikeSerializer, TipLikeSerializer, TipSerializer, AnswerSerializer, TipVoteSerializer, AnswerVoteSerializer
 from django.db.models import F
 
 
@@ -66,6 +66,7 @@ class TipListCategory(generics.ListAPIView):
         category = self.kwargs['category']
         return Tip.objects.filter(category=category)
 
+
 # GET + category-> retireve a tip of a specific category
 
 
@@ -75,6 +76,7 @@ class TipListArea(generics.ListAPIView):
     def get_queryset(self):
         area = self.kwargs['area']
         return Tip.objects.filter(area=area)
+
 
 # GET + area-> retireve a tip of a specific area
 
@@ -102,7 +104,6 @@ class TipVote(generics.RetrieveUpdateDestroyAPIView):
 # https://www.django-rest-framework.org/api-guide/requests/
 # DOC django rest HTTP: https://www.django-rest-framework.org/tutorial/2-requests-and-responses/
 
-# allow only POST
 @api_view(['POST'])
 def tip_like(request):
     # pass http request data to custom serializer
@@ -114,32 +115,114 @@ def tip_like(request):
 
     # how to read validated data
     tip_id = tip_serializer.validated_data["tip_id"]
-    is_like = tip_serializer.validated_data["is_like"]
 
-    print(f'{tip_id}')
-    print(f'{is_like}')
-
-    # how ot access user data
-    print(f'auth: {request.auth}')      # access token sender
-    print(f'user: {request.user}')      # access user instance sender
-    print(f'user group: {request.user.groups}')  # access user instance sender
-
-    """
-    example on how to check group permission for users
-    def is_in_multiple_groups(user):
-        return user.groups.filter(name__in=['group1', 'group2']).exists()
-    """
     try:
         tip = Tip.objects.get(pk=tip_id)
-
     except Tip.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.user in tip.likes.all():
+        return Response(data="Like already present", status=status.HTTP_200_OK)
+
+    if request.user in tip.dislikes.all():
+        tip.dislikes.remove(request.user)   # remove from dislike relation if present
+
+    tip.likes.add(request.user)
+    tip.save()
+
     return Response(data="Like sent", status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def tip_dislike(request):
+    # pass http request data to custom serializer
+    tip_serializer = TipVoteSerializer(data=request.data)
+
+    # check validation
+    if not tip_serializer.is_valid():
+        return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
+
+    # how to read validated data
+    tip_id = tip_serializer.validated_data["tip_id"]
+
+    try:
+        tip = Tip.objects.get(pk=tip_id)
+    except Tip.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.user in tip.dislikes.all():
+        return Response(data="Dislike already present", status=status.HTTP_200_OK)
+
+    if request.user in tip.likes.all():
+        tip.likes.remove(request.user)  # remove from like relation if present
+
+    tip.dislikes.add(request.user)
+    tip.save()
+
+    return Response(data="DisLike sent", status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def answer_like(request):
+    answer_serializer = AnswerVoteSerializer(data=request.data)
+
+    # validation
+    if not answer_serializer.is_valid():
+        return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
+    answer_id = answer_serializer.validated_data["answer_id"]
+
+    # db read
+    try:
+        answer = Answer.objects.get(pk=answer_id)
+    except Answer.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # db update
+    if request.user in answer.likes.all():
+        return Response(data="Like already present", status=status.HTTP_200_OK)
+
+    if request.user in answer.dislikes.all():
+        answer.dislikes.remove(request.user)   # remove from dislike relation if present
+
+    answer.likes.add(request.user)
+    answer.save()
+
+    return Response(data="Like sent", status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def answer_dislike(request):
+    # pass http request data to custom serializer
+    answer_serializer = AnswerVoteSerializer(data=request.data)
+
+    # check validation
+    if not answer_serializer.is_valid():
+        return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
+
+    # how to read validated data
+    answer_id = answer_serializer.validated_data["answer_id"]
+
+    try:
+        answer = Answer.objects.get(pk=answer_id)
+    except Answer.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.user in answer.dislikes.all():
+        return Response(data="Dislike already present", status=status.HTTP_200_OK)
+
+    if request.user in answer.likes.all():
+        answer.likes.remove(request.user)  # remove from like relation if present
+
+    answer.dislikes.add(request.user)
+    answer.save()
+
+    return Response(data="DisLike sent", status=status.HTTP_200_OK)
 
 
 # GET + parameter-> retireve a answer
 # PUT + parameter-> update the answer denoted by the parameter
 # DELETE + parameter-> delete the answer denoted by the parameter
+
 
 class AnswerListQuestion(generics.ListAPIView):
     serializer_class = AnswerSerializer
@@ -147,6 +230,7 @@ class AnswerListQuestion(generics.ListAPIView):
     def get_queryset(self):
         question = self.kwargs['question']
         return Answer.objects.filter(question=question)
+
 
 # GET + question-> retrieve all answer of a specific question
 

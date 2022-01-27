@@ -63,8 +63,8 @@ class Tip(models.Model):
         Category, on_delete=models.PROTECT, default='1')
     area = models.ForeignKey(
         Area, on_delete=models.PROTECT, default=1)
-    likes = models.ManyToManyField(CustomUser, blank=True, related_name='user_likes')
-    dislikes = models.ManyToManyField(CustomUser, blank=True, related_name='user_dislikes')
+    likes = models.ManyToManyField(CustomUser, blank=True, related_name='user_likes_tip')
+    dislikes = models.ManyToManyField(CustomUser, blank=True, related_name='user_dislikes_tip')
     is_star = models.BooleanField()
     objects = models.Manager()
     tipobjects = TipObjects()
@@ -87,8 +87,8 @@ class Answer(models.Model):
     text_body = models.TextField()
     author = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name='forum_Answers')
-    likes = models.PositiveIntegerField(default=0)
-    dislikes = models.PositiveIntegerField(default=0)
+    likes = models.ManyToManyField(CustomUser, blank=True, related_name='user_likes_answer')
+    dislikes = models.ManyToManyField(CustomUser, blank=True, related_name='user_dislikes_answer')
     objects = models.Manager()
     answerobjects = AnswerObjects()
 

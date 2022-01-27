@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import AnswerDetail, AnswerLike, AnswerList, QuestionList, QuestionDetail, CategoryList, TipDetail, TipLike, \
-    TipList, TipDislike, AnswerDislike, TipVote, tip_like
+    TipList, TipDislike, AnswerDislike, TipVote, tip_like, tip_dislike, answer_like, answer_dislike
 from .views import AnswerDetail, AnswerLike, AnswerList, AnswerListQuestion, QuestionList, QuestionDetail, CategoryList, TipDetail, TipLike, TipList, TipDislike, AnswerDislike, TipListArea, TipListCategory
 
 app_name = 'forum_api' #changed
@@ -20,14 +20,12 @@ urlpatterns = [
 
     path('posting/answer', AnswerList.as_view(), name='answerlistcreate'),
     path('posting/answer/<int:pk>', AnswerDetail.as_view(), name='answerdetailcreate'),
-    # path('voting/tip/<int:pk>/like', TipLike.as_view(), name='tiplike'),
-    # path('voting/tip/<int:pk>/dislike', TipDislike.as_view(), name='tipdislike'),
-    path('voting/tip/like', tip_like, name='tipvote'),
-    path('posting/answer/by-question/<question>', AnswerListQuestion.as_view(), name='answerlistquestion'),
 
-    path('voting/tip/<int:pk>/like', TipLike.as_view(), name='tiplike'),
-    path('voting/tip/<int:pk>/dislike', TipDislike.as_view(), name='tipdislike'),
-    path('voting/answer/<int:pk>/like', AnswerLike.as_view(), name='answerlike'),
-    path('voting/answer/<int:pk>/dislike', AnswerDislike.as_view(), name='answerdislike')
+    path('voting/tip/like', tip_like, name='tip_like'),
+    path('voting/tip/dislike', tip_dislike, name='tip_dislike'),
+    path('voting/answer/like', answer_like, name='answer_like'),
+    path('voting/answer/dislike', answer_dislike, name='answer_like'),
+
+    path('posting/answer/by-question/<question>', AnswerListQuestion.as_view(), name='answerlistquestion'),
     
 ]
