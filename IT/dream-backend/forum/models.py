@@ -26,10 +26,6 @@ class Category(models.Model):
 
 
 class Question(models.Model):
-    class QuestionObjects(models.Manager):
-        def get_queryset(self):
-            return super().get_queryset()
-
     timestamp = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=250)
     text_body = models.TextField()
@@ -40,7 +36,6 @@ class Question(models.Model):
     area = models.ForeignKey(
         Area, on_delete=models.PROTECT, default=1)
     objects = models.Manager()
-    questionobjects = QuestionObjects()
 
     class Meta:
         ordering = ('-timestamp',)
@@ -50,10 +45,6 @@ class Question(models.Model):
 
 
 class Tip(models.Model):
-    class TipObjects(models.Manager):
-        def get_queryset(self):
-            return super().get_queryset()
-
     timestamp = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=250)
     text_body = models.TextField()
@@ -67,7 +58,6 @@ class Tip(models.Model):
     dislikes = models.ManyToManyField(CustomUser, blank=True, related_name='user_dislikes_tip')
     is_star = models.BooleanField()
     objects = models.Manager()
-    tipobjects = TipObjects()
 
     class Meta:
         ordering = ('-timestamp',)
