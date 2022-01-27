@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from request.models import HelpRequest
+from request.models import HelpRequest, TipRequest
 
 
 # Serializers are used to bind routes together with data from the DB
@@ -10,3 +10,8 @@ class HRSerializer(serializers.ModelSerializer):
     class Meta:
         model = HelpRequest
         fields = ('id', 'title', 'author', 'content', 'status')
+
+class TRSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TipRequest
+        fields = ('id', 'proposed_title', 'author', 'proposed_tip', 'status')
