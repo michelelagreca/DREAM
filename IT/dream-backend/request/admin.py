@@ -9,3 +9,7 @@ class AuthorAdmin(admin.ModelAdmin):
     list_display = ('title', 'content', 'status', 'slug')
     prepopulated_fields = {'slug': ('title',), }
 
+@admin.register(models.TipRequest)
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ('proposed_title', 'proposed_tip', 'status', 'slug')
+    prepopulated_fields = {'slug': ('proposed_title',), }
