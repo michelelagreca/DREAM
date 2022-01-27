@@ -2,19 +2,22 @@ from email.policy import default
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-from users.models import CustomUser
+from users.models import CustomUser, Area
+
 
 # Forum Model definition
 
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
+
     class CategoryObjects(models.Manager):
         def get_queryset(self):
             return super().get_queryset()
-    
+
     objects = models.Manager()
     categoryobjects = CategoryObjects()
+
     class Meta:
         verbose_name_plural = "categories"
 
@@ -23,7 +26,6 @@ class Category(models.Model):
 
 
 class Question(models.Model):
-
     class QuestionObjects(models.Manager):
         def get_queryset(self):
             return super().get_queryset()
@@ -35,7 +37,8 @@ class Question(models.Model):
         CustomUser, on_delete=models.CASCADE, related_name='forum_Questions')
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, default='1')
-    area = models.CharField(max_length=250, default='area')
+    area = models.ForeignKey(
+        Area, on_delete=models.PROTECT, default=1)
     objects = models.Manager()
     questionobjects = QuestionObjects()
 
@@ -47,7 +50,6 @@ class Question(models.Model):
 
 
 class Tip(models.Model):
-
     class TipObjects(models.Manager):
         def get_queryset(self):
             return super().get_queryset()
@@ -59,9 +61,10 @@ class Tip(models.Model):
         CustomUser, on_delete=models.CASCADE, related_name='forum_Tips')
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, default='1')
-    area = models.CharField(max_length=250, default='area')
-    likes = models.IntegerField(default=0)
-    dislikes = models.IntegerField(default=0)
+    area = models.ForeignKey(
+        Area, on_delete=models.PROTECT, default=1)
+    likes = models.ManyToManyField(CustomUser, blank=True, related_name='user_likes')
+    dislikes = models.ManyToManyField(CustomUser, blank=True, related_name='user_dislikes')
     is_star = models.BooleanField()
     objects = models.Manager()
     tipobjects = TipObjects()
@@ -71,3 +74,26 @@ class Tip(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Answer(models.Model):
+    class AnswerObjects(models.Manager):
+        def get_queryset(self):
+            return super().get_queryset()
+
+    timestamp = models.DateTimeField(default=timezone.now)
+    question = models.ForeignKey(
+        Question, on_delete=models.CASCADE)
+    text_body = models.TextField()
+    author = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name='forum_Answers')
+    likes = models.PositiveIntegerField(default=0)
+    dislikes = models.PositiveIntegerField(default=0)
+    objects = models.Manager()
+    answerobjects = AnswerObjects()
+
+    class Meta:
+        ordering = ('-timestamp',)
+
+    # def __str__(self):
+    #     return self.title
