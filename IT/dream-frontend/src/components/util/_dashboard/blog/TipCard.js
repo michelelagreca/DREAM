@@ -1,23 +1,14 @@
-import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
-import eyeFill from '@iconify/icons-eva/eye-fill';
 import { Link as RouterLink } from 'react-router-dom';
-import shareFill from '@iconify/icons-eva/share-fill';
-import messageCircleFill from '@iconify/icons-eva/message-circle-fill';
 import like from '@iconify/icons-eva/arrow-circle-up-fill'
 import star from '@iconify/icons-eva/star-fill'
-// material
-import { alpha, styled } from '@mui/material/styles';
-import { Box, Link, Card, Grid, Avatar, Typography, CardContent } from '@mui/material';
-// utils
-
-//
-import {fDate} from "../../extra/formatTime";
+import { styled } from '@mui/material/styles';
+import { Box, Link, Card, Grid, Typography, CardContent } from '@mui/material';
 import React, {useState} from "react";
 import {fShortenNumber} from "../../extra/formatNumber";
-import SvgIconStyle from "../../SvgIconStyle";
 import TipMoreMenu from "../../../molecules/TipMoreMenu";
 import Stack from "@mui/material/Stack";
+import {fDate} from "../../extra/formatTime";
 
 // ----------------------------------------------------------------------
 
@@ -34,15 +25,6 @@ const TitleStyle = styled(Link)({
     WebkitBoxOrient: 'vertical'
 });
 
-const AvatarStyle = styled(Avatar)(({ theme }) => ({
-    zIndex: 9,
-    width: 32,
-    height: 32,
-    position: 'absolute',
-    left: theme.spacing(3),
-    bottom: theme.spacing(-2)
-}));
-
 const InfoStyle = styled('div')(({ theme }) => ({
     display: 'flex',
     flexWrap: 'wrap',
@@ -51,34 +33,35 @@ const InfoStyle = styled('div')(({ theme }) => ({
     color: theme.palette.text.disabled
 }));
 
-const CoverImgStyle = styled('img')({
-    top: 0,
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    position: 'absolute'
-});
 
 // ----------------------------------------------------------------------
-function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
-}
 
-export default function TipCard({ post, index,starT }) {
-    const { cover, title, view, comment, share, author, createdAt } = post;
-    // const latestPostLarge = index === 0;
-    // const latestPost = index === 1 || index === 2;
+/* example of tip data
+    area_id: 1
+    author_id: 2
+    category_id: 1
+    dislikes: 0
+    id: 2
+    is_star: false
+    likes: 1
+    text_body: "3344"
+    timestamp: "2022-01-27T19:08:01Z"
+    title: "33"
+    user_dislike: false
+    user_like: false
+ */
+
+export default function TipCard({ post,starT }) {
+    const { is_star, title, likes, dislikes, text_body, timestamp } = post;
     const latestPostLarge = true;  //control large size
     const latestPost = false;   //control medium size
-    const [isStar, SetIsStar] = useState(getRandomInt(0,2) === 1)
+    const [isStar, SetIsStar] = useState(is_star)
 
     const POST_INFO = [
-        { number: comment, icon: like},
+        { number: likes-dislikes, icon: like},
     ];
     const STAR_INFO = [
-        { number:1, icon: star }, //number == 1  is start
+        { number: isStar ? 1 : 0, icon: star }, //number == 1  is start
     ];
 
     return (
@@ -125,7 +108,7 @@ export default function TipCard({ post, index,starT }) {
                         variant="caption"
                         sx={{ color: 'text.disabled', display: 'block' }}
                     >
-                        {fDate(createdAt)}
+                        {fDate(timestamp)}
                     </Typography>
                     <TitleStyle
                         to="#"

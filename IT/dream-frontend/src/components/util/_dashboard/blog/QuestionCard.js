@@ -1,16 +1,10 @@
 import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
-import eyeFill from '@iconify/icons-eva/eye-fill';
 import { Link as RouterLink } from 'react-router-dom';
-import shareFill from '@iconify/icons-eva/share-fill';
 import messageCircleFill from '@iconify/icons-eva/message-circle-fill';
 import like from '@iconify/icons-eva/arrow-circle-up-fill'
-// material
-import { alpha, styled } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import { Box, Link, Card, Grid, Avatar, Typography, CardContent } from '@mui/material';
-// utils
-
-//
 import {fDate} from "../../extra/formatTime";
 import React from "react";
 import {fShortenNumber} from "../../extra/formatNumber";
@@ -32,15 +26,6 @@ const TitleStyle = styled(Link)({
     WebkitBoxOrient: 'vertical'
 });
 
-const AvatarStyle = styled(Avatar)(({ theme }) => ({
-    zIndex: 9,
-    width: 32,
-    height: 32,
-    position: 'absolute',
-    left: theme.spacing(3),
-    bottom: theme.spacing(-2)
-}));
-
 const InfoStyle = styled('div')(({ theme }) => ({
     display: 'flex',
     flexWrap: 'wrap',
@@ -49,38 +34,29 @@ const InfoStyle = styled('div')(({ theme }) => ({
     color: theme.palette.text.disabled
 }));
 
-const CoverImgStyle = styled('img')({
-    top: 0,
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    position: 'absolute'
-});
 
 // ----------------------------------------------------------------------
+/*
+{   example question
+        "id": 1,
+        "timestamp": "2022-01-28T00:04:29Z",
+        "title": "question 1",
+        "text_body": "swwswsws",
+        "author_id": 1,
+        "category_id": 1,
+        "area_id": 1,
+        "answers_number": 1
+    }
+ */
 
-QuestionCard.propTypes = {
-    post: PropTypes.object.isRequired,
-    index: PropTypes.number
-};
-function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
-}
-
-export default function QuestionCard({ post, index }) {
-    const { cover, title, view, comment, share, author, createdAt } = post;
-    // const latestPostLarge = index === 0;
-    // const latestPost = index === 1 || index === 2;
+export default function QuestionCard({ post }) {
+    const {title, answers_number, timestamp } = post;
     const latestPostLarge = true;  //control large size
     const latestPost = false;   //control medium size
 
     const POST_INFO = [
-        { number: getRandomInt(-4,100), icon: like },
-        { number: getRandomInt(2,30), icon: messageCircleFill },
-        //{ number: view, icon: eyeFill },
-        //{ number: share, icon: shareFill }
+        //{ number: 0, icon: like },
+        { number: answers_number, icon: messageCircleFill },
     ];
 
     return (
@@ -157,11 +133,11 @@ export default function QuestionCard({ post, index }) {
                         variant="caption"
                         sx={{ color: 'text.disabled', display: 'block' }}
                     >
-                        {fDate(createdAt)}
+                        {fDate(timestamp)}
                     </Typography>
 
                     <InfoStyle>
-                        <Stack direction={"row"} width={"100%"} justifyContent={"space-between"}>
+                        <Stack direction={"row"} width={"100%"} justifyContent={"flex-end"}>
                             {POST_INFO.map((info, index) => (
                                 <Box
                                     key={index}

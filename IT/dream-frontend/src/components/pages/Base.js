@@ -12,18 +12,8 @@ const Base = ({isLogoOnlyLayout = true, userTypeInit}) =>{
         posts: null,
     });
 
-    useEffect(() => {
-        setAppState({ loading: true });
-        const apiUrl = `http://127.0.0.1:8000/api/1`;
-        fetch(apiUrl)
-            .then((data) => data.json())
-            .then((posts) => {
-                setAppState({ loading: false, posts: posts });
-            });
-    }, [setAppState]);
 
     const[userType, setUserType] = useState(userTypeInit)
-    console.log(appState)
     return(
         isLogoOnlyLayout ?
             <LogoOnlyLayout/>

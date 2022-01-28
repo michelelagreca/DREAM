@@ -2,8 +2,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import generics, status
 from forum.models import Question, Category, Tip, Answer
-from .serializers import AnswerDislikeSerializer, AnswerLikeSerializer, QuestionSerializer, CategorySerializer, \
-    TipDislikeSerializer, TipLikeSerializer, TipSerializer, AnswerSerializer, TipVoteSerializer, AnswerVoteSerializer
+from .serializers import QuestionSerializer, CategorySerializer, TipSerializer, AnswerSerializer, TipVoteSerializer, \
+    AnswerVoteSerializer
+from django.core import serializers
+from django.http import HttpResponse
 from django.db.models import F
 
 
@@ -14,19 +16,42 @@ from django.db.models import F
 # from .serializers import SERIALIZER_NAME
 
 
-# ADD HERE GENERIC VIEW FOR DEBUGGING PORPOUSE, THEY ARE INCLUDED IN THE REST FRAMEWORK
 
 class CategoryList(generics.ListAPIView):
     queryset = Category.categoryobjects.all()
     serializer_class = CategorySerializer
 
 
-# GET -> list all categories
+@api_view(['GET'])
+def question_list(request):
+    qs_dict = Question.objects.values()  # get queryset in dictionary form
+    qs = Question.objects.all()  # get queryset as django queryset
+
+    for i in range(len(qs_dict)):  # complete the dictionary with info extracted by the queryset
+        answers_dic = Answer.objects.filter(question=qs[i]).values()
+        qs_dict[i]['answers_number'] = len(answers_dic)  # count related answers
+
+    return Response(data=qs_dict, status=status.HTTP_200_OK, content_type='application/json')
 
 
-class QuestionList(generics.ListCreateAPIView):
-    queryset = Question.questionobjects.all()
-    serializer_class = QuestionSerializer
+@api_view(['GET'])
+def tip_list(request):
+    qs_dict = Tip.objects.values()  # get queryset in dictionary form
+    qs = Tip.objects.all()  # get queryset as django queryset
+
+    for i in range(len(qs_dict)):  # complete the dictionary with info extracted by the queryset
+        qs_dict[i]['user_like'] = False
+        qs_dict[i]['user_dislike'] = False
+
+        if request.user in qs[i].likes.all():
+            qs_dict[i]['user_like'] = True
+        if request.user in qs[i].dislikes.all():
+            qs_dict[i]['user_dislike'] = True
+
+        qs_dict[i]['likes'] = len(qs[i].likes.values())
+        qs_dict[i]['dislikes'] = len(qs[i].dislikes.values())
+
+    return Response(data=qs_dict, status=status.HTTP_200_OK, content_type='application/json')
 
 
 # GET -> list all questions
@@ -42,13 +67,22 @@ class QuestionDetail(generics.RetrieveUpdateDestroyAPIView):
 # DELETE + parameter-> delete the question denoted by the parameter
 
 
-class TipList(generics.ListCreateAPIView):
-    queryset = Tip.tipobjects.all()
+class TipList(generics.ListAPIView):
     serializer_class = TipSerializer
+
+    def get_queryset(self):
+        queryset = Tip.objects.all()
+        for tip in queryset:
+            tip.user_like = False
+            tip.user_dislike = False
+            if self.request.user in tip.likes.all():
+                tip.user_like = True
+            if self.request.user in tip.dislikes.all():
+                tip.user_dislike = True
+        return queryset
 
 
 # GET -> list all tips
-# POST -> inserts a tips
 
 class TipDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Tip.objects.all()
@@ -95,14 +129,9 @@ class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AnswerSerializer
 
 
-# my trial
-class TipVote(generics.RetrieveUpdateDestroyAPIView):
-    # querysetRaw = Tip.objects.all()
-    pass
-
-
 # https://www.django-rest-framework.org/api-guide/requests/
 # DOC django rest HTTP: https://www.django-rest-framework.org/tutorial/2-requests-and-responses/
+
 
 @api_view(['POST'])
 def tip_like(request):
@@ -125,7 +154,7 @@ def tip_like(request):
         return Response(data="Like already present", status=status.HTTP_200_OK)
 
     if request.user in tip.dislikes.all():
-        tip.dislikes.remove(request.user)   # remove from dislike relation if present
+        tip.dislikes.remove(request.user)  # remove from dislike relation if present
 
     tip.likes.add(request.user)
     tip.save()
@@ -182,7 +211,7 @@ def answer_like(request):
         return Response(data="Like already present", status=status.HTTP_200_OK)
 
     if request.user in answer.dislikes.all():
-        answer.dislikes.remove(request.user)   # remove from dislike relation if present
+        answer.dislikes.remove(request.user)  # remove from dislike relation if present
 
     answer.likes.add(request.user)
     answer.save()
@@ -230,57 +259,6 @@ class AnswerListQuestion(generics.ListAPIView):
     def get_queryset(self):
         question = self.kwargs['question']
         return Answer.objects.filter(question=question)
-
-
-# GET + question-> retrieve all answer of a specific question
-
-
-class TipLike(generics.RetrieveAPIView):
-    queryset = Tip.objects.all()
-    serializer_class = TipLikeSerializer
-
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        Tip.objects.filter(pk=instance.id).update(likes=F('likes') + 1)
-        instance.refresh_from_db()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
-
-class AnswerLike(generics.RetrieveAPIView):
-    queryset = Answer.objects.all()
-    serializer_class = AnswerLikeSerializer
-
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        Answer.objects.filter(pk=instance.id).update(likes=F('likes') + 1)
-        instance.refresh_from_db()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
-
-class TipDislike(generics.RetrieveAPIView):
-    queryset = Tip.objects.all()
-    serializer_class = TipDislikeSerializer
-
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        Tip.objects.filter(pk=instance.id).update(dislikes=F('dislikes') + 1)
-        instance.refresh_from_db()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
-
-class AnswerDislike(generics.RetrieveAPIView):
-    queryset = Answer.objects.all()
-    serializer_class = AnswerDislikeSerializer
-
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        Answer.objects.filter(pk=instance.id).update(dislikes=F('dislikes') + 1)
-        instance.refresh_from_db()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
 
 
 """ Concrete View Classes
