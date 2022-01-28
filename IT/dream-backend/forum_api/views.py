@@ -16,18 +16,21 @@ from django.db.models import F
 # from .serializers import SERIALIZER_NAME
 
 
-# ADD HERE GENERIC VIEW FOR DEBUGGING PORPOUSE, THEY ARE INCLUDED IN THE REST FRAMEWORK
 
 class CategoryList(generics.ListAPIView):
     queryset = Category.categoryobjects.all()
     serializer_class = CategorySerializer
 
 
-# GET -> list all categories
-
 @api_view(['GET'])
 def question_list(request):
-    qs_dict = {}
+    qs_dict = Question.objects.values()  # get queryset in dictionary form
+    qs = Question.objects.all()  # get queryset as django queryset
+
+    for i in range(len(qs_dict)):  # complete the dictionary with info extracted by the queryset
+        answers_dic = Answer.objects.filter(question=qs[i]).values()
+        qs_dict[i]['answers_number'] = len(answers_dic)  # count related answers
+
     return Response(data=qs_dict, status=status.HTTP_200_OK, content_type='application/json')
 
 
@@ -42,8 +45,11 @@ def tip_list(request):
 
         if request.user in qs[i].likes.all():
             qs_dict[i]['user_like'] = True
-        if request.user in qs[i].likes.all():
+        if request.user in qs[i].dislikes.all():
             qs_dict[i]['user_dislike'] = True
+
+        qs_dict[i]['likes'] = len(qs[i].likes.values())
+        qs_dict[i]['dislikes'] = len(qs[i].dislikes.values())
 
     return Response(data=qs_dict, status=status.HTTP_200_OK, content_type='application/json')
 
