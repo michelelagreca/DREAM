@@ -2,10 +2,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import generics, status
 
-from chat.models import HrMessage
+from chat.models import HrMessage, TipMessage
 from chat.serializers import HrMessageSerializer
 from core.serializers import IdGeneralSerializer
-from request.models import HelpRequest
+from request.models import HelpRequest, TipRequest
 
 
 @api_view(['GET'])
@@ -56,6 +56,61 @@ def hr_message_add(request):
     message = HrMessage(
         body=message_serializer.validated_data['body'],
         reference_hr=hr_ref,
+        isFromSender=is_from_sender
+    )
+
+    message.save()
+    return Response(data="Message sent", status=status.HTTP_200_OK, content_type='application/json')
+
+
+@api_view(['GET'])
+def tip_message_list(request):
+    tip_serializer = IdGeneralSerializer(data=request.GET)
+
+    # check validation
+    if not tip_serializer.is_valid():
+        return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
+
+    # read validated data
+    tip_id = tip_serializer.validated_data["id"]
+
+    # try to get reference hr
+    try:
+        tip = TipRequest.objects.get(pk=tip_id)
+    except HelpRequest.DoesNotExist:
+        return Response(data="Tip not found", status=status.HTTP_404_NOT_FOUND)
+
+    # check if either the user is the author or the receiver
+    if tip.author != request.user and tip.receiver != request.user:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    # create message response object
+    messages_dict = TipMessage.objects.filter(reference_tip=tip).values()
+
+    return Response(data=messages_dict, status=status.HTTP_200_OK, content_type='application/json')
+
+
+@api_view(['POST'])
+def tip_message_add(request):
+    message_serializer = TipMessageSerializer(data=request.data)
+
+    # check validation
+    if not message_serializer.is_valid():
+        return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
+
+    # read validated data
+    tip_ref = message_serializer.validated_data["reference_hr"]
+
+    # check if either the user is the author or the receiver
+    is_from_sender = False
+    if tip_ref.author == request.user:
+        is_from_sender = True
+    elif tip_ref.author != request.user and tip_ref.receiver != request.user:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    message = TipMessage(
+        body=message_serializer.validated_data['body'],
+        reference_tip=tip_ref,
         isFromSender=is_from_sender
     )
 
