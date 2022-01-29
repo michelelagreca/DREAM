@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from chat.models import Message
+from chat.models import HrMessage
 
 
-class MessageSerializer(serializers.ModelSerializer):
+class HrMessageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Message
-        fields = ('id', 'timestamp', 'body', 'author')
+        model = HrMessage
+        fields = ('id', 'body', 'reference_hr')
