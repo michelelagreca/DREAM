@@ -6,7 +6,7 @@ from . import models
 # add possibility in admin console to create new models
 @admin.register(models.HelpRequest)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('title', 'content', 'status', 'author','receiver')
+    list_display = ('id', 'title', 'content', 'status', 'author', 'receiver')
 
 
 @admin.register(models.TipRequest)

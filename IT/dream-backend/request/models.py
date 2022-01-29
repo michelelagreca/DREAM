@@ -1,21 +1,28 @@
 from django.db import models
 from django.utils import timezone
 
-
 # HelpRequest Model definition
 from users.models import CustomUser
 
+HR_OPTIONS_EXT = [
+    'accepted',
+    'not_accepted',
+    'closed',
+    'declined',
+]
 
 class HelpRequest(models.Model):
     class HRObjects(models.Manager):
         def get_queryset(self):
             return super().get_queryset().filter(status='published')
 
-    options = (
+    HR_OPTIONS = (
         ('accepted', 'Accepted'),
         ('not_accepted', 'Not-accepted'),
         ('closed', 'Closed'),
+        ('declined', 'Declined'),
     )
+
     timestamp = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=250)
     content = models.TextField()
@@ -26,7 +33,7 @@ class HelpRequest(models.Model):
         CustomUser, on_delete=models.PROTECT, related_name='hrrequest_receiver')
 
     status = models.CharField(
-        max_length=20, choices=options, default='not_accepted')
+        max_length=20, choices=HR_OPTIONS, default='not_accepted')
 
     objects = models.Manager()  # default manager
 

@@ -29,7 +29,7 @@ urlpatterns = [
     # path('', include('request.urls', namespace='request')),
     path('api/request/', include('request_api.urls', namespace='request_api')),
 
-    #Endpoints chat
+    # Endpoints chat
     path('api/chat/', include('chat.urls', namespace='chat')),
 ]
 
