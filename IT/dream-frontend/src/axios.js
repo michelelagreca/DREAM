@@ -33,7 +33,7 @@ axiosInstance.interceptors.response.use(
 
 
         console.log(error.response.status)
-        console.log(originalRequest.url)
+        console.log("original " + originalRequest.url)
 
         if (
             error.response.data.code === 'token_not_valid' &&
@@ -42,50 +42,50 @@ axiosInstance.interceptors.response.use(
             error.response.baseURL === '/token/refresh/'
         ) {
             console.log('@FINAL REJECTION')
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            axiosInstance.defaults.headers['Authorization'] = null;
+            window.location.href = '/';
             return Promise.reject(error);
         }
 
         // handle token expiration and refresh
         if (
+            error.response.data.code === 'token_not_valid' &&
             error.response.status === 401 &&
-            error.response.baseURL === originalRequest.url
+            error.response.statusText === 'Unauthorized'
         ) {
             const refreshToken = localStorage.getItem('refresh_token');
             if (refreshToken) {
                 //const tokenParts = JSON.parse(atob(refreshToken.split('.')[1]));
                 console.log('@REFRESH TOKEN ')
 
-                    return axiosInstance
-                        .post('/token/refresh/', { refresh: refreshToken })
-                        .then((response) => {
-                            console.log('@INSIDE REFRESH' + response)
-                            localStorage.setItem('access_token', response.data.access);
-                            localStorage.setItem('refresh_token', response.data.refresh);
+                return axiosInstance
+                    .post('/token/refresh/', { refresh: refreshToken })
+                    .then((response) => {
+                        console.log('@UPDATE ACCESS TOKEN')
+                        localStorage.setItem('access_token', response.data.access);
 
-                            axiosInstance.defaults.headers['Authorization'] =
-                                'JWT ' + response.data.access;
-                            originalRequest.headers['Authorization'] =
-                                'JWT ' + response.data.access;
-                            console.log('@REFRESHED SUCCESSFULLY ')
-                            return axiosInstance(originalRequest);
-                        })
-                        .catch((err) => {
-                            console.log('Refresh token failed.');
-                            //window.location.href = '/login/';
-                            console.log(err);
-                        })
-                }
-             else {
+                        axiosInstance.defaults.headers['Authorization'] =
+                            'JWT ' + response.data.access;
+                        originalRequest.headers['Authorization'] =
+                            'JWT ' + response.data.access;
+                        console.log('@REFRESHED SUCCESSFULLY ')
+                        return axiosInstance(originalRequest);
+                    })
+                    .catch((err) => {
+                        console.log('Refresh token failed.');
+                        //window.location.href = '/login/';
+                        console.log(err);
+                    })
+            }
+            else {
                 console.log('Refresh token not available.');
                 return Promise.reject(error);
             }
         }
-        // specific error handling done elsewhere
+
         console.log('Default handler');
-        //localStorage.removeItem('access_token');
-        //localStorage.removeItem('refresh_token');
-        //axiosInstance.defaults.headers['Authorization'] = null;
-        //window.location.href = '/';
         return Promise.reject(error);
     }
 );
