@@ -9,9 +9,10 @@ from request.models import HelpRequest, TipRequest
 class HRSerializer(serializers.ModelSerializer):
     class Meta:
         model = HelpRequest
-        fields = ('id', 'title', 'author', 'content', 'status')
+        fields = ('id', 'title', 'content', 'status')
+
 
 class TRSerializer(serializers.ModelSerializer):
     class Meta:
         model = TipRequest
-        fields = ('id', 'proposed_title', 'author', 'proposed_tip', 'status')
+        fields = ('id', 'proposed_title', 'proposed_tip', 'status')

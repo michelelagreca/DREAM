@@ -10,7 +10,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import {useNavigate} from "react-router-dom";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import axiosInstance from "../../axios";
 
 function capitalizeFirstLetter(string) {
@@ -19,7 +19,8 @@ function capitalizeFirstLetter(string) {
 
 export default function SignUpFirst() {
     const [selectedRole, setSelectedRole] = useState({farmer: true, agronomist: false, policymaker:false})
-
+    //Latitudes range from -90 to 90, and longitudes range from -180 to 80.
+    const [position, setPosition] = useState({latitude: 200, longitude: 200})
     const navigation = useNavigate()
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -35,10 +36,16 @@ export default function SignUpFirst() {
             role: selectedRole.farmer ? 'farmer' : selectedRole.agronomist ? 'agronomist' : 'policymaker',
             password1: data.get("password"),
             password2: data.get("confirm-password"),
+            latitude: position.latitude,
+            longitude: position.longitude,
         };
          // soft validation
         if (form_obj.password1 !== form_obj.password2){
             alert('Password confirmation error')
+            return
+        }
+        if (selectedRole.farmer && (form_obj.latitude === 200 || form_obj.longitude === 200)){
+            alert('Sign up is not possible without access to your location')
             return
         }
         if (!form_obj.firstName || !form_obj.lastName || !form_obj.authcode || !form_obj.email || !form_obj.password1 || !form_obj.role ){
@@ -53,7 +60,9 @@ export default function SignUpFirst() {
             "auth_code":"AA",
             "password":"admin",
             "role":"agronomist",
-            "user_name":"farmer1"
+            "user_name":"farmer1",
+            "latitude":2,
+            "longitude":3
         }*/
 
         const post_obj = {
@@ -64,6 +73,8 @@ export default function SignUpFirst() {
             password:form_obj.password1,
             role:form_obj.role,
             user_name:"" + form_obj.role + form_obj.email,
+            latitude: form_obj.latitude,
+            longitude: form_obj.longitude
         }
         console.log(post_obj)
         axiosInstance
@@ -75,6 +86,14 @@ export default function SignUpFirst() {
             .catch((e)=>alert(e.response.status + " the inserted data is not valid for signing up"))
     };
 
+    // get position of the user
+    useEffect(()=>{
+        navigator.geolocation.getCurrentPosition(function(position) {
+            //console.log("Latitude is :", position.coords.latitude);
+            //console.log("Longitude is :", position.coords.longitude);
+            setPosition({latitude: position.coords.latitude, longitude: position.coords.longitude})
+        });
+    },[])
     const handleCheckbox = (role)=> {
 
         if (role === 'farmer') {
