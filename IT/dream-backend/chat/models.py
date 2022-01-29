@@ -13,7 +13,10 @@ class Message(models.Model):
     timestamp = models.DateTimeField(default=timezone.now)
     body = models.CharField(max_length=250)
     author = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name='chat_Message')
+        CustomUser, on_delete=models.CASCADE, related_name='sender_Message')
+
+    receiver = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name='receiver_Message')
     objects = models.Manager()
     messageobjects = MessageObjects()
 
