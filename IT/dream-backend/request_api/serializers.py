@@ -12,6 +12,11 @@ class HRSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'content', 'status')
 
 
+class HRChangeStatusSerializer(serializers.Serializer):
+    hr_id = serializers.IntegerField()
+    status = serializers.CharField(max_length=20)
+
+
 class TRSerializer(serializers.ModelSerializer):
     class Meta:
         model = TipRequest
