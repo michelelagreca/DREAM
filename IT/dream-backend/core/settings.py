@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'request_api',       # added
     'corsheaders',      # added
     'users',           # added
+    'chat',           # added
     'rest_framework_simplejwt.token_blacklist',  # added
 ]
 
