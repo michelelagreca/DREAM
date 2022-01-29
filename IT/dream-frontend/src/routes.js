@@ -5,7 +5,6 @@ import SignUpSecond from "./components/templates/SignUpSecond";
 import SignIn from "./components/templates/SignIn";
 import Base from "./components/pages/Base"
 import SignUpFirst from "./components/templates/SignUpFirst";
-//import DashboardApp from "./components/pages/DashboardApp";
 import Forum from "./components/pages/Forum";
 import FarmersKpis from "./components/pages/FarmersKpis";
 import SendHR from "./components/pages/SendHR";
@@ -15,13 +14,25 @@ import TipRequests from "./components/templates/TipRequests";
 import HarvestHistory from "./components/templates/HarvestHistory";
 import Faq from "./components/templates/FAQ";
 import HarvestReport from "./components/templates/harvestReport/HarvestReport";
+import {Container, Stack, Typography} from "@mui/material";
+import Page from "./components/util/Page";
 // layouts
 
 
 
-const Dummy = () =>{
+const Dummy = ({title="Work In Progress"}) =>{
     return(
-        <Logo />
+        <Page title="Work In Progress">
+            <Container>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
+                    <Typography variant="h4" gutterBottom>
+                        {title}
+                    </Typography>
+
+                </Stack>
+                <Logo/>
+            </Container>
+        </Page>
     )
 }
 
@@ -54,7 +65,7 @@ export default function Router() {
                 { path: 'harvest-rep', element: <HarvestReport/> },
                 { path: 'harvest-his', element: <HarvestHistory/> },
                 { path: 'incoming-tr', element: <TipRequests canModify/> },
-                { path: 'visit-messages', element: <Dummy/> },
+                { path: 'visit-messages', element: <Dummy title={'Visit Messages'}/> },
             ]
         },
         //agronomist routes
@@ -70,7 +81,7 @@ export default function Router() {
                 { path: 'incoming-hr', element: <Dummy/> },
                 { path: 'faq', element: <Faq/> },
                 { path: 'visit-plan', element: <Dummy/> },
-                { path: 'visit-messages', element: <Dummy/> },
+                { path: 'visit-messages', element: <Dummy title={'Visit Messages'}/> },
                 { path: 'farmers-kpis', element: <FarmersKpis/> },
             ]
         },

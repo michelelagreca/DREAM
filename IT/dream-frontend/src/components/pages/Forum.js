@@ -45,13 +45,15 @@ export default function Forum({writeQ = false, writeT = false, ShowQ = false,Ans
     axiosInstance
         .get(`reading/tips`)
         .then((res) => {
-          tips = res.data
+          if(res)
+            tips = res.data ? res.data : tips
         })
         .then(()=>{
           axiosInstance
               .get(`reading/questions`)
               .then((res) => {
-                questions = res.data
+                if(res)
+                  questions = res.data ? res.data : questions
               })
               .then(()=>{
                 setData({loading: false, questions: questions, tips: tips})

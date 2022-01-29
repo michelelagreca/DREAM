@@ -14,6 +14,7 @@ import { useFormik } from 'formik';
 import {ProductFilterSidebar} from "../util/_dashboard/products";
 import SelectBox from "../templates/SelectBox";
 import {TextFields} from "@mui/icons-material";
+import axiosInstance from "../../axios";
 
 
 // ----------------------------------------------------------------------
@@ -27,7 +28,36 @@ const SORT_OPTIONS = [
 
 export default function SendHR({writeQ = false, writeT = false, ShowQ = false,AnswerQ=false}) {
   const [hrType, setHrType] = useState(SORT_OPTIONS[0].value)
+  const [form, setForm] = useState({title:"", content:""})
 
+  const handleSend = () =>{
+    // soft validation
+    if (hrType === SORT_OPTIONS[0].value){
+      alert("This functionality will be available soon")
+      return
+    }
+    if (!form.title){
+      alert("Title is mandatory")
+      return
+    }
+    if (!form.content){
+      alert("Content is mandatory")
+      return
+    }
+
+    const post_obj = {
+      ...form
+    }
+    //console.log(post_obj)
+    axiosInstance
+        .post(`request/sending_hr_farmer/`, post_obj)
+        .then((res) =>{
+          alert("HR correctly sent")
+          console.log(res)
+          //navigation('/login')
+        })
+        .catch((e)=>alert(e))
+  }
   return (
       <Page title="Send HR">
         <Container>
@@ -43,10 +73,27 @@ export default function SendHR({writeQ = false, writeT = false, ShowQ = false,An
           </Stack>
           <Stack style={{width:"100%", marginBottom:"2rem"}}>
             <TextField
-                placeholder="MultiLine with rows: 2 and rowsMax: 4"
+                placeholder="Title"
+                rows={1}
+                onChange={(event) => {
+                  setForm({
+                    title: event.target.value,
+                    content: form.content
+                  })
+                }}
+            />
+          </Stack>
+          <Stack style={{width:"100%", marginBottom:"2rem"}}>
+            <TextField
+                placeholder="Content"
                 multiline
                 rows={5}
-                maxRows={7}
+                onChange={(event) => {
+                  setForm({
+                    title: form.title,
+                    content: event.target.value
+                  })
+                }}
             />
           </Stack>
           <Stack direction="column" alignItems="flex-end">
@@ -55,6 +102,7 @@ export default function SendHR({writeQ = false, writeT = false, ShowQ = false,An
                 component={RouterLink}
                 to="#"
                 startIcon={<Icon icon={sendFIll} />}
+                onClick={handleSend}
             >
               Send
             </Button>
