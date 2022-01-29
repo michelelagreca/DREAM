@@ -1,50 +1,110 @@
 import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import {useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {useEffect, useState} from "react";
+import axiosInstance from "../../axios";
 
-function Copyright(props) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
-                Your Website
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const theme = createTheme();
-
 export default function SignUpFirst() {
+    const [selectedRole, setSelectedRole] = useState({farmer: true, agronomist: false, policymaker:false})
+    //Latitudes range from -90 to 90, and longitudes range from -180 to 80.
+    const [position, setPosition] = useState({latitude: 200, longitude: 200})
     const navigation = useNavigate()
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         // eslint-disable-next-line no-console
 
-        // HANDLE POST HERE
-        console.log({
+        // acquire data from form
+        const form_obj = {
             firstName: data.get('firstName'),
             lastName: data.get('lastName'),
             authcode: data.get("authcode"),
-        });
-        navigation('/credentials')
+            email: data.get("email"),
+            role: selectedRole.farmer ? 'farmer' : selectedRole.agronomist ? 'agronomist' : 'policymaker',
+            password1: data.get("password"),
+            password2: data.get("confirm-password"),
+            latitude: position.latitude,
+            longitude: position.longitude,
+        };
+         // soft validation
+        if (form_obj.password1 !== form_obj.password2){
+            alert('Password confirmation error')
+            return
+        }
+        if (selectedRole.farmer && (form_obj.latitude === 200 || form_obj.longitude === 200)){
+            alert('Sign up is not possible without access to your location')
+            return
+        }
+        if (!form_obj.firstName || !form_obj.lastName || !form_obj.authcode || !form_obj.email || !form_obj.password1 || !form_obj.role ){
+            alert('Missing mandatory field, complete the forum and try again')
+            return
+        }
+        /*
+        { example post
+            "email":"c@c.it",
+            "first_name":"Mark",
+            "last_name":"doe",
+            "auth_code":"AA",
+            "password":"admin",
+            "role":"agronomist",
+            "user_name":"farmer1",
+            "latitude":2,
+            "longitude":3
+        }*/
+
+        const post_obj = {
+            email:form_obj.email,
+            first_name:capitalizeFirstLetter(form_obj.firstName),
+            last_name:capitalizeFirstLetter(form_obj.lastName),
+            auth_code:form_obj.authcode,
+            password:form_obj.password1,
+            role:form_obj.role,
+            user_name:"" + form_obj.role + form_obj.email,
+            latitude: form_obj.latitude,
+            longitude: form_obj.longitude
+        }
+        console.log(post_obj)
+        axiosInstance
+            .post(`user/register/`, post_obj)
+            .then((res) =>{
+                alert("You can now login")
+                navigation('/login')
+            })
+            .catch((e)=>alert(e.response.status + " the inserted data is not valid for signing up"))
     };
+
+    // get position of the user
+    useEffect(()=>{
+        navigator.geolocation.getCurrentPosition(function(position) {
+            //console.log("Latitude is :", position.coords.latitude);
+            //console.log("Longitude is :", position.coords.longitude);
+            setPosition({latitude: position.coords.latitude, longitude: position.coords.longitude})
+        });
+    },[])
+    const handleCheckbox = (role)=> {
+
+        if (role === 'farmer') {
+            setSelectedRole({farmer: true, agronomist: false, policymaker: false})
+        } else if (role === 'agronomist') {
+            setSelectedRole({farmer: false, agronomist: true, policymaker: false})
+        } else if (role === 'policymaker') {
+            setSelectedRole({farmer: false, agronomist: false, policymaker: true})
+        }
+
+    }
 
     return (
 
@@ -88,6 +148,23 @@ export default function SignUpFirst() {
                             />
                         </Grid>
                         <Grid item xs={12}>
+                            <FormControlLabel
+                                onClick={()=>handleCheckbox('policymaker')}
+                                control={<Checkbox value="role" color="primary" checked={selectedRole.policymaker}/>}
+                                label="Policy Maker"
+                            />
+                            <FormControlLabel
+                                onClick={()=>handleCheckbox('agronomist')}
+                                control={<Checkbox value="role" color="primary" checked={selectedRole.agronomist}/>}
+                                label="Agronomist"
+                            />
+                            <FormControlLabel
+                                onClick={()=>handleCheckbox('farmer')}
+                                control={<Checkbox value="role" color="primary" checked={selectedRole.farmer}/>}
+                                label="Farmer"
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
                             <TextField
                                 required
                                 fullWidth
@@ -98,17 +175,35 @@ export default function SignUpFirst() {
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <FormControlLabel
-                                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                                label="Policy Maker"
+                            <TextField
+                                required
+                                fullWidth
+                                id="email"
+                                label="Email Address"
+                                name="email"
+                                autoComplete="email"
                             />
-                            <FormControlLabel
-                                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                                label="Agronomist"
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                required
+                                fullWidth
+                                name="password"
+                                label="Password"
+                                type="password"
+                                id="password"
+                                autoComplete="new-password"
                             />
-                            <FormControlLabel
-                                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                                label="Farmer"
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                required
+                                fullWidth
+                                name="confirm-password"
+                                label="Confirm Password"
+                                type="password"
+                                id="confirm-password"
+                                autoComplete="confirm-password"
                             />
                         </Grid>
                     </Grid>

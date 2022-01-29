@@ -34,7 +34,7 @@ def disableAuthCode(data):
 class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('email', 'first_name', 'last_name', 'auth_code', 'password', 'role')
+        fields = ('email', 'first_name', 'last_name', 'latitude', 'longitude', 'auth_code', 'password', 'role')
         # blur auth_code and password in the user post
         extra_kwargs = {'password': {'write_only': True}, 'auth_code': {'write_only': True}}
 
@@ -52,6 +52,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
         # validate authorization code
         if data['role'] == roles[0]:
+
+            if float(data['latitude']) > float(90) or float(data['latitude']) < float(-90):
+                raise serializers.ValidationError("Invalid latitude")
+
+            if float(data['longitude']) > float(80) or float(data['longitude']) < float(-180):
+                raise serializers.ValidationError("Invalid longitude")
+
             try:
                 auth_code_object = AuthCodeFarmer.objects.get(pk=data['auth_code'])
                 checkUserAuthCode(user_data=data, code_object=auth_code_object) # assign auth code area to farmer
@@ -93,6 +100,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
             auth_code=validated_data['auth_code'],
             role=validated_data['role'],
             user_name=validated_data['user_name'],
+            latitude=validated_data['latitude'],
+            longitude=validated_data['longitude'],
             is_active=True,     # the user is activated immediately, change here if needed
             **geo_args
         )

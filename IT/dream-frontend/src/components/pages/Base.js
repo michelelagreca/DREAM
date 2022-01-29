@@ -12,7 +12,6 @@ const Base = ({isLogoOnlyLayout = true, userTypeInit}) =>{
         posts: null,
     });
 
-
     const[userType, setUserType] = useState(userTypeInit)
     return(
         isLogoOnlyLayout ?

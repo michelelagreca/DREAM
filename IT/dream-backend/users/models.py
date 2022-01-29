@@ -84,7 +84,7 @@ class CustomAccountManager(BaseUserManager):
         # call to the function below, basically a super user is a normal user
         return self.create_user(email=email, password=password, **other_fields)
 
-    def create_user(self, email, user_name, first_name, last_name, auth_code, password, **other_fields):
+    def create_user(self, email, user_name, first_name, last_name, auth_code, password, longitude, latitude, **other_fields):
 
         if not email:
             raise ValueError('You must provide an email address')
@@ -122,8 +122,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     area = models.ForeignKey(Area, on_delete=models.PROTECT, blank=True, null=True)
     district = models.ForeignKey(District, on_delete=models.PROTECT, null=True)
     role = models.CharField(max_length=20, blank=False, default='no role')
+    latitude = models.DecimalField(decimal_places=9, max_digits=13, blank=False)
+    longitude = models.DecimalField(decimal_places=9, max_digits=13, blank=False)
 
     objects = CustomAccountManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'auth_code', 'role', 'user_name']
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'auth_code', 'role', 'latitude', 'user_name', 'longitude']

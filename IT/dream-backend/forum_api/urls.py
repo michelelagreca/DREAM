@@ -3,7 +3,7 @@ from .views import tip_like, tip_dislike, answer_like, answer_dislike, question_
 from .views import AnswerDetail, AnswerList, AnswerListQuestion, QuestionDetail, CategoryList, TipDetail, TipListArea, \
     TipListCategory
 
-app_name = 'forum_api' # changed
+app_name = 'forum_api'  # changed
 
 # we get redirected here from the core
 # here we define the application (api in this case) endpoints
@@ -28,5 +28,5 @@ urlpatterns = [
     path('voting/answer/dislike', answer_dislike, name='answer_like'),
 
     path('posting/answer/by-question/<question>', AnswerListQuestion.as_view(), name='answerlistquestion'),
-    
+
 ]
