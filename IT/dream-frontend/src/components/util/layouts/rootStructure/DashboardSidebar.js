@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 // material
 import { styled } from '@mui/material/styles';
@@ -14,6 +14,7 @@ import SidebarFarmer from "./SidebarFarmer";
 import SideBarAgronomist from "./SideBarAgronomist";
 import SidebarPolicyMaker from "./SidebarPolicyMaker";
 import SidebarAnonymous from "./SidebarAnonymous";
+import axiosInstance from "../../../../axios";
 
 
 // ----------------------------------------------------------------------
@@ -44,7 +45,21 @@ DashboardSidebar.propTypes = {
 
 
 export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar, userType }) {
+    const [user, setUser] = useState({name:"", email:""})
     const { pathname } = useLocation();
+
+    useEffect(()=>{
+        axiosInstance
+            .get(`user/info/`,)
+            .then((res) =>{
+                if(res.data[0])
+                    setUser({
+                        name : res.data[0].first_name + " " + res.data[0].last_name,
+                        email : res.data[0].email
+                    })
+            })
+            .catch((e)=>alert(e))
+    },[])
 
     useEffect(() => {
         if (isOpenSidebar) {
@@ -72,7 +87,7 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar, userTy
                         {userType !== 'anonymous' ? <Avatar src={account.photoURL} alt="photoURL" />: null}
                         <Box sx={{ ml: 2 }}>
                             <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                                {userType !== 'anonymous' ? account.displayName : "Anonymous User"}
+                                {userType !== 'anonymous' ? user.name : "Anonymous User"}
                             </Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                                 {userType !== 'anonymous' ? userType : ""}
@@ -81,9 +96,6 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar, userTy
                     </AccountStyle>
                 </Link>
             </Box>
-            {
-                console.log(userType)
-            }
             {
                 userType === 'farmer' ?
                     <SidebarFarmer/>

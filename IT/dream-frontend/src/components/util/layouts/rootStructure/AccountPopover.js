@@ -1,5 +1,5 @@
 import { Icon } from '@iconify/react';
-import React, { useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import homeFill from '@iconify/icons-eva/home-fill';
 import personFill from '@iconify/icons-eva/person-fill';
 import settings2Fill from '@iconify/icons-eva/settings-2-fill';
@@ -34,6 +34,7 @@ export default function AccountPopover() {
     const anchorRef = useRef(null);
     const navigate = useNavigate()
     const [open, setOpen] = useState(false);
+    const [user, setUser] = useState({name:"", email:""})
 
     const handleOpen = () => {
         setOpen(true);
@@ -57,6 +58,19 @@ export default function AccountPopover() {
         axiosInstance.defaults.headers['Authorization'] = null;
         navigate('/')
     };
+
+    useEffect(()=>{
+        axiosInstance
+            .get(`user/info/`,)
+            .then((res) =>{
+                if(res.data[0])
+                    setUser({
+                        name : res.data[0].first_name + " " + res.data[0].last_name,
+                        email : res.data[0].email
+                    })
+            })
+            .catch((e)=>alert(e))
+    },[])
 
     return (
         <>
@@ -91,10 +105,10 @@ export default function AccountPopover() {
             >
                 <Box sx={{ my: 1.5, px: 2.5 }}>
                     <Typography variant="subtitle1" noWrap>
-                        {account.displayName}
+                        {user.name}
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                        {account.email}
+                        {user.email}
                     </Typography>
                 </Box>
 
