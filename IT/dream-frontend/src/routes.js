@@ -63,7 +63,7 @@ export default function Router() {
                 { path: 'faq', element: <Faq/>},
                 { path: 'incoming-hr', element: <HrRequests/> },
                 { path: 'harvest-rep', element: <HarvestReport/> },
-                { path: 'harvest-his', element: <HarvestHistory/> },
+                { path: 'harvest-his', element: /*<HarvestHistory/>*/ <Dummy title={'Harvest History'}/>  },
                 { path: 'incoming-tr', element: <TipRequests canModify/> },
                 { path: 'visit-messages', element: <Dummy title={'Visit Messages'}/> },
             ]

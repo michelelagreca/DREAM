@@ -45,7 +45,8 @@ function HrItem({ hr, setSelectedHr }) {
 export default function HrRequests() {
     const [selectedHr,setSelectedHr] = useState(null)
     const [data, setData] = useState({loading: true})
-    console.log(data)
+
+    //console.log(data)
     // get hr requests
     useEffect(()=>{
         if(data.loading)
@@ -81,7 +82,7 @@ export default function HrRequests() {
                         {!selectedHr ?
                             <Stack spacing={3} sx={{p: 3, pr: 0}}>
                                 {data.hr_list.map((hr,i) => (
-                                    <HrItem key={"" + i + hr.title} hr={hr} setSelectedHr={setSelectedHr}/>
+                                    <HrItem key={i} hr={hr} setSelectedHr={setSelectedHr}/>
                                 ))}
                             </Stack>
                             :
