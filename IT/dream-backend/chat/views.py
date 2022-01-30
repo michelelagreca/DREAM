@@ -3,10 +3,12 @@ from rest_framework.response import Response
 from rest_framework import generics, status
 
 from chat.models import HrMessage, TipMessage
-from chat.serializers import HrMessageSerializer
+from chat.serializers import HrMessageSerializer, TipMessageSerializer
 from core.serializers import IdGeneralSerializer
 from request.models import HelpRequest, TipRequest
 
+
+# --------------  HELP REQUEST  --------------
 
 @api_view(['GET'])
 def hr_message_list(request):
@@ -63,6 +65,8 @@ def hr_message_add(request):
     return Response(data="Message sent", status=status.HTTP_200_OK, content_type='application/json')
 
 
+# --------------  TIP REQUEST  --------------
+
 @api_view(['GET'])
 def tip_message_list(request):
     tip_serializer = IdGeneralSerializer(data=request.GET)
@@ -99,19 +103,19 @@ def tip_message_add(request):
         return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
 
     # read validated data
-    tip_ref = message_serializer.validated_data["reference_hr"]
+    tip_ref = message_serializer.validated_data["reference_tip"]
 
     # check if either the user is the author or the receiver
-    is_from_sender = False
+    is_from_farmer = False
     if tip_ref.author == request.user:
-        is_from_sender = True
+        is_from_farmer = True
     elif tip_ref.author != request.user and tip_ref.receiver != request.user:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     message = TipMessage(
         body=message_serializer.validated_data['body'],
         reference_tip=tip_ref,
-        isFromSender=is_from_sender
+        isFromFarmer=is_from_farmer
     )
 
     message.save()
