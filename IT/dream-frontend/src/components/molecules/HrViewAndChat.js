@@ -6,12 +6,8 @@ import './chat.css';
 import Button from "@mui/material/Button";
 import axiosInstance from "../../axios";
 
-const EXAMPLE_CHAT = [
-    {writer: 'user', text:'I need help!'},
-    {writer: 'extern', text:'I can help you, no worries'},
-]
 
-const HrViewAndChat = ({item, setData, setSelectedHr, isHrSender=true}) =>{
+const HrViewAndChat = ({item, setData, setSelectedHr}) =>{
     const [deleteMessages, setDeleteMessages] = useState(0)
     const [chat, setChat] = useState({loading: true, data:[]})
 
@@ -71,13 +67,7 @@ const HrViewAndChat = ({item, setData, setSelectedHr, isHrSender=true}) =>{
         setData({loading:true})
         setSelectedHr(null)
     }
-    /*
-        Possible next states of the HR
 
-        'not_accepted',
-        'closed',
-        'declined',
-    */
     const handleAccept = () => {
         const post_obj = {
             hr_id: item.id,
