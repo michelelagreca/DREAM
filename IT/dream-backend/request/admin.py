@@ -11,4 +11,4 @@ class AuthorAdmin(admin.ModelAdmin):
 
 @admin.register(models.TipRequest)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('proposed_title', 'proposed_tip', 'status', 'slug')
+    list_display = ('id', 'proposed_title', 'proposed_tip', 'status')
