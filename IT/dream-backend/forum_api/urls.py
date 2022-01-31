@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import tip_like, tip_dislike, answer_like, answer_dislike, question_list, tip_list, TipList, answer_list, \
-    question_add, tip_add
+    question_add, tip_add, answer_add
 from .views import AnswerDetail, AnswerList, AnswerListQuestion, QuestionDetail, CategoryList, TipDetail, TipListArea, \
     TipListCategory
 
@@ -18,7 +18,7 @@ urlpatterns = [
     path('posting/tip/by-category/<category>', TipListCategory.as_view(), name='tiplistcategory'),
     path('posting/tip/by-area/<area>', TipListArea.as_view(), name='tiplistarea'),
 
-    path('posting/answer', AnswerList.as_view(), name='answerlistcreate'),
+    path('posting/answer/', answer_add, name='answerlistcreate'),
     path('posting/answer/<int:pk>', AnswerDetail.as_view(), name='answerdetailcreate'),
 
     path('reading/tips', tip_list, name='tiplistcreate'),

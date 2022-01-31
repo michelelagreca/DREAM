@@ -165,6 +165,37 @@ class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 @api_view(['POST'])
+def answer_add(request):
+    # pass http request data to custom serializer
+    answer_serializer = AnswerSerializer(data=request.data)
+
+    print(request.data)
+    print(answer_serializer.is_valid())
+    # prevent anonymous user to access
+    if request.user.is_anonymous:
+        return Response("Invalid Request", status=status.HTTP_403_FORBIDDEN)
+
+    # check validation
+    if not answer_serializer.is_valid():
+        return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
+
+    """try:
+        question = Question.objects.get(pk=answer_serializer.validated_data["question"])
+    except Question.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)"""
+
+    # create answer instance
+    answer = Answer(
+        question=answer_serializer.validated_data["question"],
+        author=request.user,
+        text_body=answer_serializer.validated_data["text_body"],
+    )
+    answer.save()
+
+    return Response(data="Answer sent", status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
 def question_add(request):
     # pass http request data to custom serializer
     question_serializer = QuestionSerializer(data=request.data)

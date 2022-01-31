@@ -43,7 +43,7 @@ class TipSerializer(serializers.ModelSerializer):
 class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
-        fields = ('id', 'timestamp', 'question', 'text_body', 'author', 'likes', 'dislikes')
+        fields = ('question', 'text_body')
 
 
 class TipLikeSerializer(serializers.ModelSerializer):

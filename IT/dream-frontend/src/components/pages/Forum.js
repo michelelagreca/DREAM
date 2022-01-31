@@ -1,7 +1,7 @@
 import { Icon } from '@iconify/react';
 import plusFill from '@iconify/icons-eva/plus-fill';
 import { Link as RouterLink } from 'react-router-dom';
-import { Grid, Button, Container, Stack, Typography } from '@mui/material';
+import {Grid, Button, Container, Stack, Typography, TextField, MenuItem} from '@mui/material';
 import Page from "../util/Page";
 import { QuestionCard, TipCard, BlogPostsSort} from '../../components/util/_dashboard/blog';
 import React, {useEffect, useState} from "react";
@@ -10,6 +10,9 @@ import {ProductFilterSidebar} from "../util/_dashboard/products";
 import CircularProgressCenter from "../molecules/CircularProgressCenter";
 import axiosInstance from "../../axios";
 import PostDisplayer from "../molecules/PostDisplayer";
+import {Card} from "@material-ui/core";
+import FormControl from "@material-ui/core/FormControl";
+import sendFIll from "@iconify/icons-eva/corner-left-up-outline";
 
 
 // ----------------------------------------------------------------------
@@ -26,6 +29,7 @@ export default function Forum({writeQ = false, writeT = false, ShowQ = false,Ans
   const [openFilter, setOpenFilter] = useState(false);
   const [data, setData] = useState({loading: true})
   const [openPost, setOpenPost] = useState({isTip:false})
+  const [answer, setAnswer] = useState("")
 
   const formik = useFormik({
     initialValues: {
@@ -94,7 +98,7 @@ export default function Forum({writeQ = false, writeT = false, ShowQ = false,Ans
                         <Button
                             variant="contained"
                             component={RouterLink}
-                            to="#"
+                            to="/farmer/send-question"
                             startIcon={<Icon icon={plusFill}/>}
                         >
                           New Question
@@ -103,7 +107,7 @@ export default function Forum({writeQ = false, writeT = false, ShowQ = false,Ans
                         <Button
                             variant="contained"
                             component={RouterLink}
-                            to="#"
+                            to="/farmer/send-tip"
                             startIcon={<Icon icon={plusFill}/>}
                         >
                           New Tip
@@ -142,6 +146,7 @@ export default function Forum({writeQ = false, writeT = false, ShowQ = false,Ans
           {
             openPost.post ?
                 <PostDisplayer
+                    AnswerQ={AnswerQ}
                     setPost={setOpenPost}
                     isTip={openPost.isTip}
                     post={openPost.post}/>

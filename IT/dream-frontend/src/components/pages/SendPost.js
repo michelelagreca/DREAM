@@ -6,6 +6,9 @@ import Page from "../util/Page";
 import React, {useEffect, useState} from "react";
 import axiosInstance from "../../axios";
 import SelectBox from "../templates/SelectBox";
+import Select from "@material-ui/core/Select";
+import InputLabel from "@material-ui/core/InputLabel";
+import FormControl from "@material-ui/core/FormControl";
 
 
 // ----------------------------------------------------------------------
@@ -16,7 +19,7 @@ import SelectBox from "../templates/SelectBox";
 export default function SendPost({type}) {
     const [form, setForm] = useState({title:"", text_body:""})
     const [category, setCategory] = useState(null)
-    const [catList, setCatList] = useState({loading:true})
+    const [catList, setCatList] = useState({loading:true, categories:[]})
     const navigation = useNavigate()
 
     useEffect(()=>{
@@ -27,6 +30,10 @@ export default function SendPost({type}) {
             })
             .catch(e=>alert(e))
     },[])
+
+    const handleChangeCategory = (event) => {
+        setCategory(event.target.value);
+    };
 
     const handleSend = () =>{
         if (!form.title){
@@ -58,7 +65,7 @@ export default function SendPost({type}) {
 
         else if(type === 'question')
             axiosInstance
-                .post(`posting/tip/`, post_obj)
+                .post(`posting/question/`, post_obj)
                 .then((res) =>{
                     alert("Question posted")
                     navigation('/forum')
@@ -89,14 +96,22 @@ export default function SendPost({type}) {
                 <Stack mb={5} direction="row" alignItems="center" justifyContent="space-between">
                     {/*<BlogPostsSearch posts={POSTS} />*/}
                     {!catList.loading ?
-                        <TextField label={"Category"} select style={{minWidth:"10rem"}}>
-                            {catList.categories.map((option, i) => (
-                                <MenuItem key={i} value={option.name} onClick={()=>setCategory(option.name)}>
-                                    {option.name}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    : null
+                        <FormControl fullWidth>
+                            <TextField
+                                select
+                                value={category}
+                                label="Category"
+                                onChange={handleChangeCategory}
+                                style={{minWidth:"10rem"}}
+                            >
+                                {catList.categories.map((option, i) => (
+                                    <MenuItem key={i} value={option.name} onClick={()=>setCategory(option.name)}>
+                                        {option.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </FormControl>
+                        : null
                     }
                 </Stack>
                 <Stack style={{width:"100%", marginBottom:"2rem"}}>

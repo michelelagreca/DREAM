@@ -1,6 +1,18 @@
 import { Icon } from '@iconify/react';
 import { formatDistance } from 'date-fns';
-import {Box, Stack, Link, Card, Button, Divider, Typography, CardHeader, IconButton, Container} from '@mui/material';
+import {
+    Box,
+    Stack,
+    Link,
+    Card,
+    Button,
+    Divider,
+    Typography,
+    CardHeader,
+    IconButton,
+    Container,
+    TextField
+} from '@mui/material';
 import React, {useEffect, useState} from "react";
 import arrowBack from "@iconify/icons-eva/arrow-back-fill";
 import CircularProgressCenter from "../molecules/CircularProgressCenter";
@@ -12,8 +24,10 @@ import like from "@iconify/icons-eva/arrow-circle-up-fill";
 import dislike from "@iconify/icons-eva/arrow-circle-up-fill";
 import none from "@iconify/icons-eva/arrow-back-fill";
 import AnswerLikeMenu from "./AnswerLikeMenu";
+import {Link as RouterLink} from "react-router-dom";
+import sendFIll from "@iconify/icons-eva/corner-left-up-outline";
 
-function AnswerItem({ answer, setSelectedHr }) {
+function AnswerItem({ answer, setSelectedHr, }) {
     /* answer example
     author_id: 1
     dislikes: 0
@@ -62,13 +76,35 @@ function AnswerItem({ answer, setSelectedHr }) {
     );
 }
 
-export default function PostDisplayer({isTip, post, setPost}) {
+export default function PostDisplayer({isTip, post, setPost, AnswerQ}) {
     const [selectedAnswer,setSelectedAnswer] = useState(null)
     const [data, setData] = useState({loading: true})
+    const [newAnswer, setNewAnswer] = useState("")
 
-    //console.log(data)
+    const handleAnswer = (event) =>{
+        if(!newAnswer){
+            alert("Empty answer")
+            return
+        }
+        /*
+        answer format
+        'question', 'text_body',
+         */
+        const post_obj ={
+            question: post.id,
+            text_body: newAnswer
+        }
+        axiosInstance
+            .post('posting/answer/', post_obj)
+            .then((res) =>{
+                alert("Answer sent")
+                setData({loading: true})
+            })
+            .catch((e)=>alert(e))
+    }
+
+
     // get all answers
-
     useEffect(()=>{
         if(data.loading && !isTip)
             axiosInstance
@@ -94,6 +130,32 @@ export default function PostDisplayer({isTip, post, setPost}) {
                 </IconButton>
             </Stack>
             <PostDetailsCard post={post} />
+            {
+                !data.loading && AnswerQ ?
+                    <Stack mt={2} >
+                        <Stack direction="column" alignItems="center" justifyContent="space-around" mt={1}>
+                            <Stack style={{width:"100%", marginBottom:"1rem"}}>
+                                <TextField
+                                    label={"Answer"}
+                                    placeholder="Write your answer..."
+                                    multiline
+                                    rows={4}
+                                    onChange={(event)=>setNewAnswer(event.target.value)}
+                                />
+                            </Stack>
+                        </Stack>
+                        <Stack direction="rows" alignItems="center" justifyContent={"flex-end"} mb={1}>
+                            <Button
+                                variant="contained"
+                                startIcon={<Icon icon={sendFIll} />}
+                                onClick={handleAnswer}
+                            >
+                                Publish Answer
+                            </Button>
+                        </Stack>
+                    </Stack>
+                    : null
+            }
             {!data.loading ?
                 <Stack mt={2} >
                     <Card>
