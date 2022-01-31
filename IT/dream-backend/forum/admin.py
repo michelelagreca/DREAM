@@ -6,7 +6,7 @@ from . import models
 
 @admin.register(models.Category)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name')
+    list_display = ('name',)
 
 
 @admin.register(models.Question)

@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import generics, status
-
+from django.utils import timezone
 from core.serializers import IdGeneralSerializer
 from forum.models import Question, Category, Tip, Answer
 from .serializers import QuestionSerializer, CategorySerializer, TipSerializer, AnswerSerializer, TipVoteSerializer, \
@@ -162,6 +162,63 @@ class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
 
 # https://www.django-rest-framework.org/api-guide/requests/
 # DOC django rest HTTP: https://www.django-rest-framework.org/tutorial/2-requests-and-responses/
+
+
+@api_view(['POST'])
+def question_add(request):
+    # pass http request data to custom serializer
+    question_serializer = QuestionSerializer(data=request.data)
+
+    # check validation
+    if not question_serializer.is_valid():
+        return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        category = Category.objects.get(name=question_serializer.validated_data["category"])
+    except Category.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # create question instance
+    question = Question(
+        title=question_serializer.validated_data["title"],
+        text_body=question_serializer.validated_data["text_body"],
+        author=request.user,
+        category=category,
+        area=request.user.area,
+    )
+    question.save()
+
+    return Response(data="Like sent", status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def tip_add(request):
+    # pass http request data to custom serializer
+    tip_serializer = TipSerializer(data=request.data)
+    print(request.data)
+    print(tip_serializer.is_valid())
+    print(request.user.area)
+    # check validation
+    if not tip_serializer.is_valid():
+        return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        category = Category.objects.get(pk=tip_serializer.validated_data["category"])
+    except Category.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # create question instance
+    tip = Tip(
+        title=tip_serializer.validated_data["title"],
+        text_body=tip_serializer.validated_data["text_body"],
+        author=request.user,
+        category=category,
+        area=request.user.area,
+        is_star=False,
+    )
+    tip.save()
+
+    return Response(data="Like sent", status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])

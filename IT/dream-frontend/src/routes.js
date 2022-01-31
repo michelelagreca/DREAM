@@ -16,6 +16,7 @@ import Faq from "./components/templates/FAQ";
 import HarvestReport from "./components/templates/harvestReport/HarvestReport";
 import {Container, Stack, Typography} from "@mui/material";
 import Page from "./components/util/Page";
+import SendPost from "./components/pages/SendPost";
 // layouts
 
 
@@ -54,11 +55,13 @@ export default function Router() {
             element: <Base isLogoOnlyLayout={false} userTypeInit={"farmer"}/>,
             children: [
                 { element: <Navigate to="/farmer/forum" replace /> },
-                { path: 'forum', element: <Forum
+                { path: 'forum',
+                    element: <Forum
                         writeQ = {true}
                         writeT = {true}
                         ShowQ = {true}
-                        AnswerQ={true}/> },
+                        AnswerQ={true}/>
+                },
                 { path: 'send-hr', element: <SendHR/> },
                 { path: 'faq', element: <Faq/>},
                 { path: 'incoming-hr', element: <HrRequests/> },
@@ -66,6 +69,8 @@ export default function Router() {
                 { path: 'harvest-his', element: /*<HarvestHistory/>*/ <Dummy title={'Harvest History'}/>  },
                 { path: 'incoming-tr', element: <TipRequests canModify/> },
                 { path: 'visit-messages', element: <Dummy title={'Visit Messages'}/> },
+                { path: 'send-question', element: <SendPost type={"question"}/> },
+                { path: 'send-tip', element: <SendPost type={"tip"}/> }
             ]
         },
         //agronomist routes

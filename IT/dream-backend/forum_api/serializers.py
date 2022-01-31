@@ -10,7 +10,7 @@ from forum.models import Question, Category, Tip, Answer
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('id', 'name')
+        fields = ('name',)
     
 
 
@@ -18,7 +18,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     # category = serializers.SerializerMethodField()
     class Meta:
         model = Question
-        fields = ('id', 'timestamp', 'title', 'text_body', 'author', 'category', 'area')
+        fields = ('id', 'title', 'text_body', 'category')
 
     # def get_category(self, category):
     #       return category.category.name 
@@ -37,7 +37,7 @@ class AnswerVoteSerializer(serializers.Serializer):
 class TipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tip
-        fields = ('id', 'timestamp', 'title', 'text_body', 'author', 'category', 'area', 'likes', 'dislikes', 'is_star')
+        fields = ('id', 'title', 'text_body', 'category')
 
 
 class AnswerSerializer(serializers.ModelSerializer):

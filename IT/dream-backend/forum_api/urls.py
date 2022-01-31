@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import tip_like, tip_dislike, answer_like, answer_dislike, question_list, tip_list, TipList, answer_list
+from .views import tip_like, tip_dislike, answer_like, answer_dislike, question_list, tip_list, TipList, answer_list, \
+    question_add, tip_add
 from .views import AnswerDetail, AnswerList, AnswerListQuestion, QuestionDetail, CategoryList, TipDetail, TipListArea, \
     TipListCategory
 
@@ -8,9 +9,10 @@ app_name = 'forum_api'  # changed
 # we get redirected here from the core
 # here we define the application (api in this case) endpoints
 urlpatterns = [
-    path('posting/category', CategoryList.as_view(), name='categorylist'),
+    path('categories', CategoryList.as_view(), name='categorylist'),
 
-    path('posting/question/<int:pk>/', QuestionDetail.as_view(), name='questiondetailcreate'),
+    path('posting/question/', question_add, name='questioncreate'),
+    path('posting/tip/', tip_add, name='tipcreate'),
 
     path('posting/tip/<int:pk>/', TipDetail.as_view(), name='tipdetailcreate'),
     path('posting/tip/by-category/<category>', TipListCategory.as_view(), name='tiplistcategory'),

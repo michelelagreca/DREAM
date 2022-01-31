@@ -9,7 +9,7 @@ from users.models import CustomUser, Area
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, primary_key=True)
 
     class CategoryObjects(models.Manager):
         def get_queryset(self):
@@ -26,15 +26,15 @@ class Category(models.Model):
 
 
 class Question(models.Model):
-    timestamp = models.DateTimeField(default=timezone.now)
+    timestamp = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=250)
     text_body = models.TextField()
     author = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name='forum_Questions')
+        CustomUser, on_delete=models.CASCADE, related_name='forum_Questions', blank=False)
     category = models.ForeignKey(
-        Category, on_delete=models.PROTECT, default='1')
+        Category, on_delete=models.PROTECT, blank=False)
     area = models.ForeignKey(
-        Area, on_delete=models.PROTECT, default=1)
+        Area, on_delete=models.PROTECT, blank=False)
     objects = models.Manager()
 
     class Meta:
@@ -45,15 +45,15 @@ class Question(models.Model):
 
 
 class Tip(models.Model):
-    timestamp = models.DateTimeField(default=timezone.now)
+    timestamp = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=250)
     text_body = models.TextField()
     author = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name='forum_Tips')
+        CustomUser, on_delete=models.CASCADE, related_name='forum_Tips', blank=False)
     category = models.ForeignKey(
-        Category, on_delete=models.PROTECT, default='1')
+        Category, on_delete=models.PROTECT, blank=False)
     area = models.ForeignKey(
-        Area, on_delete=models.PROTECT, default=1)
+        Area, on_delete=models.PROTECT, blank=False)
     likes = models.ManyToManyField(CustomUser, blank=True, related_name='user_likes_tip')
     dislikes = models.ManyToManyField(CustomUser, blank=True, related_name='user_dislikes_tip')
     is_star = models.BooleanField()
