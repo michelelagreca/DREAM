@@ -10,10 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import sys
-sys.dont_write_bytecode = True
-
 from pathlib import Path
 from datetime import timedelta
+sys.dont_write_bytecode = True
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

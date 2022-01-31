@@ -73,6 +73,8 @@ class CustomAccountManager(BaseUserManager):
         other_fields.setdefault('user_name', email)
         other_fields.setdefault('auth_code', 'no code')
         other_fields.setdefault('first_name', 'no name')
+        other_fields.setdefault('latitude', '0')
+        other_fields.setdefault('longitude', '0')
 
         if other_fields.get('is_staff') is not True:
             raise ValueError(
@@ -81,10 +83,11 @@ class CustomAccountManager(BaseUserManager):
             raise ValueError(
                 'Superuser must be assigned to is_superuser=True.')
 
+        print(other_fields)
         # call to the function below, basically a super user is a normal user
         return self.create_user(email=email, password=password, **other_fields)
 
-    def create_user(self, email, user_name, first_name, last_name, auth_code, password, longitude, latitude, **other_fields):
+    def create_user(self, email, user_name, first_name, last_name, auth_code, password, **other_fields):
 
         if not email:
             raise ValueError('You must provide an email address')
@@ -96,8 +99,6 @@ class CustomAccountManager(BaseUserManager):
             raise ValueError('You must provide an last name')
         if not auth_code:
             raise ValueError('You must provide authorization code')
-        if not auth_code:
-            raise ValueError('You must provide a role')
 
         # normalization of data before creation
         email = self.normalize_email(email)
