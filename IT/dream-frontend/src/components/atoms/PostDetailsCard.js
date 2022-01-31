@@ -1,15 +1,14 @@
-import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
 import { Link as RouterLink } from 'react-router-dom';
 import messageCircleFill from '@iconify/icons-eva/message-circle-fill';
 import like from '@iconify/icons-eva/arrow-circle-up-fill'
 import { styled } from '@mui/material/styles';
 import { Box, Link, Card, Grid, Avatar, Typography, CardContent } from '@mui/material';
-import {fDate} from "../../extra/formatTime";
-import React from "react";
-import {fShortenNumber} from "../../extra/formatNumber";
-import SvgIconStyle from "../../SvgIconStyle";
 import Stack from "@mui/material/Stack";
+import React from "react";
+import {fDate} from "../util/extra/formatTime";
+import {fShortenNumber} from "../util/extra/formatNumber";
+import SvgIconStyle from "../util/SvgIconStyle";
 
 // ----------------------------------------------------------------------
 
@@ -49,8 +48,8 @@ const InfoStyle = styled('div')(({ theme }) => ({
     }
  */
 
-export default function QuestionCard({ post, setPost }) {
-    const {title, answers_number, timestamp } = post;
+export default function PostDetailsCard({post}) {
+    const {title, answers_number, timestamp, text_body } = post;
     const latestPostLarge = true;  //control large size
     const latestPost = false;   //control medium size
 
@@ -60,7 +59,7 @@ export default function QuestionCard({ post, setPost }) {
     ];
 
     return (
-        <Grid item xs={12} sm={latestPostLarge ? 12 : 6} md={latestPostLarge ? 6 : 3}>
+        <Grid item xs={12} sm={latestPostLarge ? 12 : 6} md={latestPostLarge ? 8 : 3}>
             <Card sx={{ position: 'relative' }}>
                 <CardMediaStyle
                     sx={{
@@ -114,12 +113,9 @@ export default function QuestionCard({ post, setPost }) {
                     }}
                 >
                     <TitleStyle
-                        to="#"
                         color="inherit"
                         variant="subtitle2"
                         underline="hover"
-                        component={RouterLink}
-                        onClick={()=>setPost({isTip:false, post : post})}
                         sx={{
                             ...(latestPostLarge && { typography: 'h5', height: 60 }),
                             ...((latestPostLarge || latestPost) && {
@@ -129,6 +125,13 @@ export default function QuestionCard({ post, setPost }) {
                     >
                         {title}
                     </TitleStyle>
+                    <Typography
+                        gutterBottom
+                        variant="subtitle1"
+                        sx={{ color: 'text.disabled', display: 'block' }}
+                    >
+                        {text_body}
+                    </Typography>
                     <Typography
                         gutterBottom
                         variant="caption"

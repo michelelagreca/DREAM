@@ -51,7 +51,7 @@ const InfoStyle = styled('div')(({ theme }) => ({
     user_like: false
  */
 
-export default function TipCard({ post,starT }) {
+export default function TipCard({ post, starT, setPost }) {
     const { is_star, title, likes, dislikes, text_body, timestamp } = post;
     const latestPostLarge = true;  //control large size
     const latestPost = false;   //control medium size
@@ -116,6 +116,7 @@ export default function TipCard({ post,starT }) {
                         variant="subtitle2"
                         underline="hover"
                         component={RouterLink}
+                        onClick={()=>setPost({isTip:true, post : post})}
                         sx={{
                             ...(latestPostLarge && { typography: 'h5', height: 60 }),
                             ...((latestPostLarge || latestPost) && {

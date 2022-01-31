@@ -9,6 +9,7 @@ import { useFormik } from 'formik';
 import {ProductFilterSidebar} from "../util/_dashboard/products";
 import CircularProgressCenter from "../molecules/CircularProgressCenter";
 import axiosInstance from "../../axios";
+import PostDisplayer from "../molecules/PostDisplayer";
 
 
 // ----------------------------------------------------------------------
@@ -24,6 +25,7 @@ export default function Forum({writeQ = false, writeT = false, ShowQ = false,Ans
   const [postType, setPostType] = useState(SORT_OPTIONS[0].value)
   const [openFilter, setOpenFilter] = useState(false);
   const [data, setData] = useState({loading: true})
+  const [openPost, setOpenPost] = useState({isTip:false})
 
   const formik = useFormik({
     initialValues: {
@@ -77,62 +79,74 @@ export default function Forum({writeQ = false, writeT = false, ShowQ = false,Ans
     resetForm();
   };
 
+  console.log(openPost)
   return (
-      <Page title="Dashboard: Forum | Minimal-UI">
+      <Page title="Forum">
         <Container>
-          <Stack direction="row" alignItems="flex-start" justifyContent="space-between" mb={5}>
-            <Typography variant="h4" gutterBottom>
-              Forum
-            </Typography>
-            <Stack direction="column" alignItems="flex-end" spacing={1} justifyContent="space-between" mb={5}>
-              {writeQ ?
-                  <Button
-                      variant="contained"
-                      component={RouterLink}
-                      to="#"
-                      startIcon={<Icon icon={plusFill} />}
-                  >
-                    New Question
-                  </Button> : null}
-              {writeT ?
-                  <Button
-                      variant="contained"
-                      component={RouterLink}
-                      to="#"
-                      startIcon={<Icon icon={plusFill} />}
-                  >
-                    New Tip
-                  </Button> : null}
-            </Stack>
-          </Stack>
+          {!openPost.post ?
+              <Stack>
+                <Stack direction="row" alignItems="flex-start" justifyContent="space-between" mb={5}>
+                  <Typography variant="h4" gutterBottom>
+                    Forum
+                  </Typography>
+                  <Stack direction="column" alignItems="flex-end" spacing={1} justifyContent="space-between" mb={5}>
+                    {writeQ ?
+                        <Button
+                            variant="contained"
+                            component={RouterLink}
+                            to="#"
+                            startIcon={<Icon icon={plusFill}/>}
+                        >
+                          New Question
+                        </Button> : null}
+                    {writeT ?
+                        <Button
+                            variant="contained"
+                            component={RouterLink}
+                            to="#"
+                            startIcon={<Icon icon={plusFill}/>}
+                        >
+                          New Tip
+                        </Button> : null}
+                  </Stack>
+                </Stack>
 
-          <Stack mb={5} direction="row" alignItems="center" justifyContent="space-between">
-            {/*<BlogPostsSearch posts={POSTS} />*/}
-            <ProductFilterSidebar
-                writeQ={writeQ}
-                writeT={writeT}
-                formik={formik}
-                isOpenFilter={openFilter}
-                onResetFilter={handleResetFilter}
-                onOpenFilter={handleOpenFilter}
-                onCloseFilter={handleCloseFilter}
-            />
-            <BlogPostsSort options={SORT_OPTIONS} onSort={setPostType} value={postType}/>
-          </Stack>
+                <Stack mb={5} direction="row" alignItems="center" justifyContent="space-between">
+                  {/*<BlogPostsSearch posts={POSTS} />*/}
+                  <ProductFilterSidebar
+                      writeQ={writeQ}
+                      writeT={writeT}
+                      formik={formik}
+                      isOpenFilter={openFilter}
+                      onResetFilter={handleResetFilter}
+                      onOpenFilter={handleOpenFilter}
+                      onCloseFilter={handleCloseFilter}
+                  />
+                  <BlogPostsSort options={SORT_OPTIONS} onSort={setPostType} value={postType}/>
+                </Stack>
+              </Stack>: null}
           <CircularProgressCenter isLoading={data.loading}/>
-          {!data.loading ?
+          {!data.loading && !openPost.post ?
               <Grid container spacing={3}>
                 {postType === 'Posts' ?
                     data.questions.map((post, index) => (
-                        <QuestionCard key={post.id} post={post} index={index}/>
+                        <QuestionCard key={post.id} post={post} index={index} setPost={setOpenPost}/>
                     ))
                     :
                     data.tips.map((post, index) => (
-                        <TipCard key={post.id} post={post} index={index} starT={startT}/>
+                        <TipCard key={post.id} post={post} index={index} starT={startT} setPost={setOpenPost}/>
                     ))
                 }
               </Grid>
               : null}
+          {
+            openPost.post ?
+                <PostDisplayer
+                    setPost={setOpenPost}
+                    isTip={openPost.isTip}
+                    post={openPost.post}/>
+                : null
+          }
         </Container>
       </Page>
   );
