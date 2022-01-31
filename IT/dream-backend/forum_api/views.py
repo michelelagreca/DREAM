@@ -1,6 +1,8 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import generics, status
+
+from core.serializers import IdGeneralSerializer
 from forum.models import Question, Category, Tip, Answer
 from .serializers import QuestionSerializer, CategorySerializer, TipSerializer, AnswerSerializer, TipVoteSerializer, \
     AnswerVoteSerializer
@@ -16,7 +18,6 @@ from django.db.models import F
 # from .serializers import SERIALIZER_NAME
 
 
-
 class CategoryList(generics.ListAPIView):
     queryset = Category.categoryobjects.all()
     serializer_class = CategorySerializer
@@ -30,6 +31,36 @@ def question_list(request):
     for i in range(len(qs_dict)):  # complete the dictionary with info extracted by the queryset
         answers_dic = Answer.objects.filter(question=qs[i]).values()
         qs_dict[i]['answers_number'] = len(answers_dic)  # count related answers
+
+    return Response(data=qs_dict, status=status.HTTP_200_OK, content_type='application/json')
+
+
+@api_view(['GET'])
+def answer_list(request):
+    question_serializer = IdGeneralSerializer(data=request.GET)
+
+    # check validation
+    if not question_serializer.is_valid():
+        return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
+
+    # read validated data
+    question_id = question_serializer.validated_data["id"]
+
+    # get answers
+    qs = Answer.objects.filter(question_id=question_id)
+    qs_dict = Answer.objects.filter(question_id=question_id).values()
+
+    for i in range(len(qs_dict)):  # complete the dictionary with info extracted by the queryset
+        qs_dict[i]['user_like'] = False
+        qs_dict[i]['user_dislike'] = False
+
+        if request.user in qs[i].likes.all():
+            qs_dict[i]['user_like'] = True
+        if request.user in qs[i].dislikes.all():
+            qs_dict[i]['user_dislike'] = True
+
+        qs_dict[i]['likes'] = len(qs[i].likes.values())
+        qs_dict[i]['dislikes'] = len(qs[i].dislikes.values())
 
     return Response(data=qs_dict, status=status.HTTP_200_OK, content_type='application/json')
 

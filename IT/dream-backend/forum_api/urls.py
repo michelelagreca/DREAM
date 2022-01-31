@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import tip_like, tip_dislike, answer_like, answer_dislike, question_list, tip_list, TipList
+from .views import tip_like, tip_dislike, answer_like, answer_dislike, question_list, tip_list, TipList, answer_list
 from .views import AnswerDetail, AnswerList, AnswerListQuestion, QuestionDetail, CategoryList, TipDetail, TipListArea, \
     TipListCategory
 
@@ -26,6 +26,8 @@ urlpatterns = [
     path('voting/tip/dislike', tip_dislike, name='tip_dislike'),
     path('voting/answer/like', answer_like, name='answer_like'),
     path('voting/answer/dislike', answer_dislike, name='answer_like'),
+
+    path('reading/answers/', answer_list, name='answer_list'),
 
     path('posting/answer/by-question/<question>', AnswerListQuestion.as_view(), name='answerlistquestion'),
 
