@@ -17,7 +17,7 @@ import sendFIll from "@iconify/icons-eva/corner-left-up-outline";
 
 // ----------------------------------------------------------------------
 
-const SORT_OPTIONS = [
+const SELECT_OPTIONS = [
   { value: 'Posts', label: 'Questions' },
   { value: 'Tips', label: 'Tips' },
 ];
@@ -25,12 +25,13 @@ const SORT_OPTIONS = [
 // ----------------------------------------------------------------------
 
 export default function Forum({writeQ = false, writeT = false, ShowQ = false,AnswerQ=false, startT=false}) {
-  const [postType, setPostType] = useState(SORT_OPTIONS[0].value)
+  const [postType, setPostType] = useState(SELECT_OPTIONS[0].value)
   const [openFilter, setOpenFilter] = useState(false);
   const [data, setData] = useState({loading: true})
   const [openPost, setOpenPost] = useState({isTip:false})
   const [answer, setAnswer] = useState("")
 
+  console.log(openPost)
   const formik = useFormik({
     initialValues: {
       gender: '',
@@ -48,25 +49,26 @@ export default function Forum({writeQ = false, writeT = false, ShowQ = false,Ans
     // post request to login
     let questions = []
     let tips = []
-    axiosInstance
-        .get(`reading/tips`)
-        .then((res) => {
-          if(res)
-            tips = res.data ? res.data : tips
-        })
-        .then(()=>{
-          axiosInstance
-              .get(`reading/questions`)
-              .then((res) => {
-                if(res)
-                  questions = res.data ? res.data : questions
-              })
-              .then(()=>{
-                setData({loading: false, questions: questions, tips: tips})
-              })
-        })
-        .catch(e=>alert(e))
-  }, [])
+    if(data.loading)
+      axiosInstance
+          .get(`reading/tips`)
+          .then((res) => {
+            if(res)
+              tips = res.data ? res.data : tips
+          })
+          .then(()=>{
+            axiosInstance
+                .get(`reading/questions`)
+                .then((res) => {
+                  if(res)
+                    questions = res.data ? res.data : questions
+                })
+                .then(()=>{
+                  setData({loading: false, questions: questions, tips: tips})
+                })
+          })
+          .catch(e=>alert(e))
+  }, [data])
 
   const { resetForm, handleSubmit } = formik;
 
@@ -83,7 +85,6 @@ export default function Forum({writeQ = false, writeT = false, ShowQ = false,Ans
     resetForm();
   };
 
-  console.log(openPost)
   return (
       <Page title="Forum">
         <Container>
@@ -126,7 +127,13 @@ export default function Forum({writeQ = false, writeT = false, ShowQ = false,Ans
                       onOpenFilter={handleOpenFilter}
                       onCloseFilter={handleCloseFilter}
                   />
-                  <BlogPostsSort options={SORT_OPTIONS} onSort={setPostType} value={postType}/>
+                  <TextField select size="small" value={postType}>
+                    {SELECT_OPTIONS.map((option) => (
+                        <MenuItem key={option.value} value={option.value} onClick={()=>setPostType(option.value)}>
+                          {option.label}
+                        </MenuItem>
+                    ))}
+                  </TextField>
                 </Stack>
               </Stack>: null}
           <CircularProgressCenter isLoading={data.loading}/>
@@ -149,7 +156,9 @@ export default function Forum({writeQ = false, writeT = false, ShowQ = false,Ans
                     AnswerQ={AnswerQ}
                     setPost={setOpenPost}
                     isTip={openPost.isTip}
-                    post={openPost.post}/>
+                    post={openPost.post}
+                    setData={setData}
+                />
                 : null
           }
         </Container>

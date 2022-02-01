@@ -1,14 +1,18 @@
 import { Icon } from '@iconify/react';
-import { Link as RouterLink } from 'react-router-dom';
+import {Link as RouterLink, useNavigate} from 'react-router-dom';
 import messageCircleFill from '@iconify/icons-eva/message-circle-fill';
 import like from '@iconify/icons-eva/arrow-circle-up-fill'
 import { styled } from '@mui/material/styles';
-import { Box, Link, Card, Grid, Avatar, Typography, CardContent } from '@mui/material';
+import {Box, Link, Card, Grid, Avatar, Typography, CardContent, IconButton} from '@mui/material';
 import Stack from "@mui/material/Stack";
 import React from "react";
 import {fDate} from "../util/extra/formatTime";
 import {fShortenNumber} from "../util/extra/formatNumber";
 import SvgIconStyle from "../util/SvgIconStyle";
+import AnswerLikeMenu from "../molecules/AnswerLikeMenu";
+import star from '@iconify/icons-eva/star-fill'
+import axiosInstance from "../../axios";
+import arrowBack from "@iconify/icons-eva/arrow-back-fill";
 
 // ----------------------------------------------------------------------
 
@@ -48,18 +52,79 @@ const InfoStyle = styled('div')(({ theme }) => ({
     }
  */
 
-export default function PostDetailsCard({post}) {
-    const {title, answers_number, timestamp, text_body } = post;
+export default function PostDetailsCard({post, isTip, setPost, setData}) {
+    const {user_like, user_dislike, title, answers_number, timestamp, text_body, likes, dislikes, is_star, id } = post;
     const latestPostLarge = true;  //control large size
     const latestPost = false;   //control medium size
+    const up = likes ? likes : 0
+    const down = dislikes ? dislikes : 0
+    const navigation = useNavigate()
 
-    const POST_INFO = [
-        //{ number: 0, icon: like },
-        { number: answers_number, icon: messageCircleFill },
-    ];
+    const handleTipLike = (event) =>{
+        const post_obj ={
+            tip_id: id,
+        }
+        axiosInstance
+            .post('voting/tip/like', post_obj)
+            .then((res) =>{
+                let postRefreshed = {...post}
+                postRefreshed.likes = postRefreshed.likes + 1
+                postRefreshed.user_dislike = false
+                postRefreshed.user_like = true
+                setPost({isTip:isTip, post:postRefreshed})
+            })
+            .catch((e)=>alert(e))
+    }
+    const handleTipDislike = (event) =>{
+        const post_obj ={
+            tip_id: id,
+        }
+        axiosInstance
+            .post('voting/tip/dislike', post_obj)
+            .then((res) =>{
+                let postRefreshed = {...post}
+                postRefreshed.dislikes = postRefreshed.dislikes + 1
+                postRefreshed.user_dislike = true
+                postRefreshed.user_like = false
+                setPost({isTip:isTip, post:postRefreshed})
+            })
+            .catch((e)=>alert(e))
+    }
+    const handleTipRemoveVote = (event) =>{
+        const post_obj ={
+            tip_id: id,
+        }
+        axiosInstance
+            .post('voting/tip/remove-vote', post_obj)
+            .then((res) =>{
+                let postRefreshed = {...post}
+                if(user_like) {
+                    postRefreshed.user_dislike = false
+                    postRefreshed.user_like = false
+                    postRefreshed.likes = postRefreshed.likes - 1
+                    setPost({isTip: isTip, post: postRefreshed})
+                }
+                else if (user_dislike){
+                    postRefreshed.dislikes = postRefreshed.dislikes - 1
+                    postRefreshed.user_dislike = false
+                    postRefreshed.user_like = false
+                    setPost({isTip: isTip, post: postRefreshed})
+                }
+            })
+            .catch((e)=>alert(e))
+    }
+
 
     return (
         <Grid item xs={12} sm={latestPostLarge ? 12 : 6} md={latestPostLarge ? 8 : 3}>
+            <Stack m={1} direction="row" alignItems="flex-start">
+                <IconButton onClick={() => {
+                    setPost({isTip: isTip})
+                    setData({loading: true})
+                }}>
+                    <Icon icon={arrowBack} width={25} height={25}/>
+                </IconButton>
+            </Stack>
             <Card sx={{ position: 'relative' }}>
                 <CardMediaStyle
                     sx={{
@@ -139,27 +204,29 @@ export default function PostDetailsCard({post}) {
                     >
                         {fDate(timestamp)}
                     </Typography>
-
-                    <InfoStyle>
-                        <Stack direction={"row"} width={"100%"} justifyContent={"flex-end"}>
-                            {POST_INFO.map((info, index) => (
-                                <Box
-                                    key={index}
-                                    sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        ml: index === 0 ? 0 : 1.5,
-                                        ...((latestPostLarge || latestPost) && {
-                                            color: 'grey.500'
-                                        })
-                                    }}
-                                >
-                                    <Box component={Icon} icon={info.icon} sx={{ width: 20, height: 25, mr: 0.5 }} />
-                                    <Typography variant="caption">{fShortenNumber(info.number)}</Typography>
-                                </Box>
-                            ))}
-                        </Stack>
-                    </InfoStyle>
+                    {isTip ?
+                        <InfoStyle>
+                            <Stack direction={"row"} width={"100%"} justifyContent={"space-between"}>
+                                <Stack>
+                                    {is_star ? <Box component={Icon} icon={star}
+                                                    sx={{width: 30, height: 35, mr: 0.5, color: "gold"}}/>
+                                        : null
+                                    }
+                                    <Typography variant="caption1">{`Score: ${up - down}`}</Typography>
+                                </Stack>
+                                <Stack>
+                                    <AnswerLikeMenu
+                                        handleRemove={handleTipRemoveVote}
+                                        handleLike={handleTipLike}
+                                        handleDislike={handleTipDislike}
+                                        isUserLike={user_like}
+                                        isUserDislike={user_dislike}
+                                    />
+                                </Stack>
+                            </Stack>
+                        </InfoStyle>
+                        : null
+                    }
                 </CardContent>
             </Card>
         </Grid>

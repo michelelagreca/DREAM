@@ -58,7 +58,7 @@ export default function AnswerLikeMenu({isUserLike, isUserDislike, handleLike, h
                             </ListItemIcon>
                             : isUserDislike ?
                             <ListItemIcon>
-                                <Box sx={{color: 'gold', display: 'flex', alignItems: 'center'}}>
+                                <Box sx={{color: 'red', display: 'flex', alignItems: 'center'}}>
                                     <Icon icon={remove} width={20} height={25}/>
                                 </Box>
                             </ListItemIcon>
