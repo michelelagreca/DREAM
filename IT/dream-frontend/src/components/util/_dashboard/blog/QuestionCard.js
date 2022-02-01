@@ -49,7 +49,7 @@ const InfoStyle = styled('div')(({ theme }) => ({
     }
  */
 
-export default function QuestionCard({ post }) {
+export default function QuestionCard({ post, setPost }) {
     const {title, answers_number, timestamp } = post;
     const latestPostLarge = true;  //control large size
     const latestPost = false;   //control medium size
@@ -119,6 +119,7 @@ export default function QuestionCard({ post }) {
                         variant="subtitle2"
                         underline="hover"
                         component={RouterLink}
+                        onClick={()=>setPost({isTip:false, post : post})}
                         sx={{
                             ...(latestPostLarge && { typography: 'h5', height: 60 }),
                             ...((latestPostLarge || latestPost) && {

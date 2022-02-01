@@ -21,6 +21,7 @@ axiosInstance.interceptors.response.use(
     async function (error) {            //handle token errors
         const originalRequest = error.config;
 
+        console.log('@ERROR HANDLER')
         if (typeof error.response === 'undefined') {
             alert(
                 'A server/network error occurred. ' +
@@ -30,11 +31,21 @@ axiosInstance.interceptors.response.use(
             return Promise.reject(error);
         }
 
+
+        console.log(error.response.status)
+        console.log("original " + originalRequest.url)
+
         if (
+            error.response.data.code === 'token_not_valid' &&
             error.response.status === 401 &&
-            originalRequest.url === baseURL + 'token/refresh/'
+            error.response.statusText === 'Unauthorized' &&
+            error.response.baseURL === '/token/refresh/'
         ) {
-            window.location.href = '/login/';
+            console.log('@FINAL REJECTION')
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            axiosInstance.defaults.headers['Authorization'] = null;
+            window.location.href = '/';
             return Promise.reject(error);
         }
 
@@ -45,42 +56,36 @@ axiosInstance.interceptors.response.use(
             error.response.statusText === 'Unauthorized'
         ) {
             const refreshToken = localStorage.getItem('refresh_token');
-
             if (refreshToken) {
-                const tokenParts = JSON.parse(atob(refreshToken.split('.')[1]));
+                //const tokenParts = JSON.parse(atob(refreshToken.split('.')[1]));
+                console.log('@REFRESH TOKEN ')
 
-                // exp date in token is expressed in seconds, while now() returns milliseconds:
-                const now = Math.ceil(Date.now() / 1000);
-                console.log(tokenParts.exp);
+                return axiosInstance
+                    .post('/token/refresh/', { refresh: refreshToken })
+                    .then((response) => {
+                        console.log('@UPDATE ACCESS TOKEN')
+                        localStorage.setItem('access_token', response.data.access);
 
-                if (tokenParts.exp > now) {     //if token is expired send post to refresh the token
-                    return axiosInstance
-                        .post('/token/refresh/', { refresh: refreshToken })
-                        .then((response) => {
-                            localStorage.setItem('access_token', response.data.access);
-                            localStorage.setItem('refresh_token', response.data.refresh);
-
-                            axiosInstance.defaults.headers['Authorization'] =
-                                'JWT ' + response.data.access;
-                            originalRequest.headers['Authorization'] =
-                                'JWT ' + response.data.access;
-
-                            return axiosInstance(originalRequest);
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                        });
-                } else {
-                    console.log('Refresh token is expired', tokenParts.exp, now);
-                    window.location.href = '/login/';
-                }
-            } else {
+                        axiosInstance.defaults.headers['Authorization'] =
+                            'JWT ' + response.data.access;
+                        originalRequest.headers['Authorization'] =
+                            'JWT ' + response.data.access;
+                        console.log('@REFRESHED SUCCESSFULLY ')
+                        return axiosInstance(originalRequest);
+                    })
+                    .catch((err) => {
+                        console.log('Refresh token failed.');
+                        //window.location.href = '/login/';
+                        console.log(err);
+                    })
+            }
+            else {
                 console.log('Refresh token not available.');
-                window.location.href = '/login/';
+                return Promise.reject(error);
             }
         }
 
-        // specific error handling done elsewhere
+        console.log('Default handler');
         return Promise.reject(error);
     }
 );

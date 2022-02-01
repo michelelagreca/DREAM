@@ -1,3 +1,6 @@
+from rest_framework.decorators import api_view
+
+from .models import CustomUser
 from .serializers import RegistrationSerializer
 from rest_framework import generics
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -44,3 +47,15 @@ class BlacklistTokenUpdateView(APIView):
             return Response(status=status.HTTP_205_RESET_CONTENT)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def user_info(request):
+
+    if request.user.is_anonymous:
+        return Response(data=[], status=status.HTTP_200_OK)
+
+    user_dict = CustomUser.objects.filter(pk=request.user.id) \
+        .values('first_name', 'last_name', 'role', 'email', 'area_id', 'district_id')
+
+    return Response(data=user_dict, status=status.HTTP_200_OK, content_type='application/json')

@@ -1,8 +1,14 @@
 from rest_framework import serializers
-from chat.models import Message
+from chat.models import HrMessage, TipMessage
 
 
-class MessageSerializer(serializers.ModelSerializer):
+class HrMessageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Message
-        fields = ('id', 'timestamp', 'body', 'author')
+        model = HrMessage
+        fields = ('id', 'body', 'reference_hr')
+
+
+class TipMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TipMessage
+        fields = ('id', 'body', 'reference_tip')

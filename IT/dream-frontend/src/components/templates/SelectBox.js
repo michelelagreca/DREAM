@@ -10,10 +10,10 @@ BlogPostsSort.propTypes = {
   onSort: PropTypes.func
 };
 
-export default function BlogPostsSort({ options, onSelect, defaultValue="" }) {
+export default function BlogPostsSort({ options, onSelect, defaultValue="", label="" }) {
 
   return (
-    <TextField select size="small" defaultValue={defaultValue}>
+    <TextField label={label} select defaultValue={defaultValue} style={{minWidth:"10rem"}}>
       {options.map((option) => (
         <MenuItem key={option.value} value={option.value} onClick={()=>onSelect(option.value)}>
           {option.label}

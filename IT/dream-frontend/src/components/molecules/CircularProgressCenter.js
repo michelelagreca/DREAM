@@ -16,7 +16,7 @@ export default function CircularProgressCenter({isLoading}) {
         <>
             {isLoading ?
                 <Stack mb={5} direction="column" alignItems="center" justifyContent="space-between">
-                    <CircularProgress color="success" />
+                    <CircularProgress />
                 </Stack>
             : null}
         </>

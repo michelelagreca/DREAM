@@ -1,46 +1,118 @@
-import {IconButton, Stack, TextField, Typography} from "@mui/material";
-import Label from "../util/Label";
+import { Stack, TextField, Typography} from "@mui/material";
 import React, {useEffect, useState} from 'react';
 import { Widget, addResponseMessage,addUserMessage,dropMessages} from 'react-chat-widget';
 import 'react-chat-widget/lib/styles.css';
 import './chat.css';
 import Button from "@mui/material/Button";
-import {Icon} from "@iconify/react";
-import moreVerticalFill from "@iconify/icons-eva/more-vertical-fill";
+import axiosInstance from "../../axios";
 
 
-const HrViewAndChat = ({item, chat, isAcceptedInit=false, isCloseInit=false}) =>{
-    const [isClose, setIsClose] = useState(isCloseInit)
-    const [isAccepted, setIsAccepted] = useState(isAcceptedInit)
-    const [deleteMessages, setDeleteMEssages] = useState(0)
+const HrViewAndChat = ({item, setData, setSelectedHr}) =>{
+    const [deleteMessages, setDeleteMessages] = useState(0)
+    const [chat, setChat] = useState({loading: true, data:[]})
 
+    console.log(chat)
+    //TODO post chat
+    useEffect(()=>{
+        console.log('render chat')
+        if(chat.loading)
+            axiosInstance
+                // get messages by id of hr (item is the showed hr)
+                .get(`chat/load-hr-messages/`, {params: {id: item.id}})
+                .then((res) => {
+                    setChat({loading: false, data: res.data})
+                    res.data.forEach((message)=>{
+                        if(message['isFromSender'] === item.is_sender)
+                            addUserMessage(message.body)
+                        else addResponseMessage(message.body)
+                    })
+                })
+                .catch(e=>alert(e))
+    }, [chat])
+
+    /*prevent user to write in the chat*/
     useEffect(()=>{
         dropMessages()
-        chat.forEach((message)=>{
-            if(message["writer"] === 'user')
-                addUserMessage(message.text)
-            else addResponseMessage(message.text)
-        })
-    },[])
-    useEffect(()=>{
-        dropMessages()
-        chat.forEach((message)=>{
-            if(message["writer"] === 'user')
-                addUserMessage(message.text)
-            else addResponseMessage(message.text)
+        chat.data.forEach((message)=>{
+            if(message['isFromSender'] === item.is_sender)
+                addUserMessage(message.body)
+            else addResponseMessage(message.body)
         })
     },[deleteMessages])
 
     const handleNewUserMessage = (newMessage) => {
         console.log(`New message incoming! ${newMessage}`);
-        // Now send the message throught the backend API
+
+        //'body', 'reference_hr'
+        const post_obj = {
+            reference_hr: item.id,
+            body:newMessage,
+        }
+
+        axiosInstance
+            .post(`chat/send-hr-message/`, post_obj)
+            .then((res) =>{
+                console.log('message sent')
+            })
+            .catch((e)=>alert(e))
     };
     const handleNewUserMessageLock = () => {
         const i = deleteMessages % 10 + 1
-        setDeleteMEssages(i)
+        setDeleteMessages(i)
     };
     const getCustomLauncher = (text="handleToggle",handleToggle) =>
         <Button style={{alignSelf:"flex-end",marginTop:"1rem", marginRight:"1rem",marginBottom:"0.5rem"}} variant={"contained"} onClick={handleToggle}>{text}</Button>
+
+    const cleanPage = () =>{
+        setData({loading:true})
+        setSelectedHr(null)
+    }
+
+    const handleAccept = () => {
+        const post_obj = {
+            hr_id: item.id,
+            status:'accepted'
+        }
+        console.log(post_obj)
+        axiosInstance
+            .post(`request/changing_status_hr_farmer/`, post_obj)
+            .then((res) =>{
+                alert("HR status correctly updated")
+                cleanPage()
+            })
+            .catch((e)=>alert(e))
+    }
+
+    const handleDecline = () => {
+        const post_obj = {
+            hr_id: item.id,
+            status:'declined'
+        }
+        console.log(post_obj)
+        axiosInstance
+            .post(`request/changing_status_hr_farmer/`, post_obj)
+            .then((res) =>{
+                alert("HR status correctly updated")
+                cleanPage()
+            })
+            .catch((e)=>alert(e))
+    }
+
+    const handleClose = () => {
+        const post_obj = {
+            hr_id: item.id,
+            status:'closed'
+        }
+        console.log(post_obj)
+        axiosInstance
+            .post(`request/changing_status_hr_farmer/`, post_obj)
+            .then((res) =>{
+                alert("HR status correctly updated")
+                cleanPage()
+            })
+            .catch((e)=>alert(e))
+    }
+
     return(
         <div>
             <Stack spacing={1} sx={{ p: 3, pr: 0 }}>
@@ -54,31 +126,45 @@ const HrViewAndChat = ({item, chat, isAcceptedInit=false, isCloseInit=false}) =>
             </Stack>
             <Stack spacing={1} sx={{ p: 3, pr: 0 }}>
                 <Typography variant="subtitle3" >
+                    {'Status:'}
+                </Typography>
+                <TextField
+                    disabled={true}
+                    value={item ? item.status : ""}
+                />
+            </Stack>
+            <Stack spacing={1} sx={{ p: 3, pr: 0 }}>
+                <Typography variant="subtitle3" >
                     {'Request:'}
                 </Typography>
                 <TextField
                     disabled={true}
-                    placeholder="MultiLine with rows: 2 and rowsMax: 4"
+                    placeholder="Request content"
                     multiline
-                    rows={5}
-                    maxRows={7}
+                    rows={7}
+                    defaultValue={item ? item.content : ""}
                 />
             </Stack>
-            {!isAccepted  && !isClose?
+            {item.status === 'not_accepted' && !item.is_sender ?
                 <Stack spacing={1} sx={{p: 3, pr: 0}}>
-                    <Button variant={"contained"} onClick={()=>setIsAccepted(true)}>Accept</Button>
-                    <Button color="error" variant={"contained"} onClick={()=>{
+                    <Button variant={"contained"} onClick={handleAccept}>Accept</Button>
+                    <Button color="error" variant={"contained"} onClick={handleDecline}>Decline</Button>
+                    {/*<Button color="error" variant={"contained"} onClick={()=>{
                         setIsAccepted(false)
                         setIsClose(true)
-                    }}>Decline</Button>
+                    }}>Decline</Button>*/}
                 </Stack>
-                : !isClose ?
-                    <Stack spacing={1} sx={{p: 3, pr: 0}}>
-                        <Button color="error" variant={"contained"} onClick={()=>{
-                            setIsClose(true)
-                        }}>Close HR</Button>
+                :item.status === 'not_accepted' && item.is_sender ?
+                    <Stack spacing={1} sx={{ p: 3, pr: 0 , alignItems:"center"}} >
+                        <Typography variant="subtitle1" >
+                            {'This HR is pending, the other farmer need to accept'}
+                        </Typography>
                     </Stack>
-                    : isAccepted ?
+                : item.status === 'accepted' ?
+                    <Stack spacing={1} sx={{p: 3, pr: 0}}>
+                        <Button color="error" variant={"contained"} onClick={handleClose}>Close HR</Button>
+                    </Stack>
+                    : item.status === 'closed' ?
                         <Stack spacing={1} sx={{ p: 3, pr: 0 , alignItems:"center"}} >
                             <Typography variant="subtitle1" color={"error"}>
                                 {'This HR is closed'}
@@ -91,7 +177,7 @@ const HrViewAndChat = ({item, chat, isAcceptedInit=false, isCloseInit=false}) =>
                             </Typography>
                         </Stack>
             }
-            {isAccepted && !isClose?
+            {item.status === 'accepted' ?
                 <Widget
                     fullScreenMode={false}
                     title="HR Messages"
@@ -101,7 +187,7 @@ const HrViewAndChat = ({item, chat, isAcceptedInit=false, isCloseInit=false}) =>
                     handleNewUserMessage={handleNewUserMessage}
                     launcher={handleToggle => getCustomLauncher("HR Messages",handleToggle)}
                 />
-                : isAccepted && isClose ?
+                : item.status === 'closed' ?
                     <Widget
                         fullScreenMode={false}
                         title="HR Messages History"

@@ -76,7 +76,7 @@ export default function SignUpFirst() {
             latitude: form_obj.latitude,
             longitude: form_obj.longitude
         }
-        console.log(post_obj)
+        //console.log(post_obj)
         axiosInstance
             .post(`user/register/`, post_obj)
             .then((res) =>{

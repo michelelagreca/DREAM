@@ -6,6 +6,6 @@ from .models import HarvestReport
 # add possibility in admin console to create new models
 @admin.register(HarvestReport)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('firstName', 'lastName', 'date', 'id', 'status', 'slug', 'author')
+    list_display = ('firstName', 'lastName', 'date', 'id', 'author')
     #prepopulated_fields = {'slug': ('title',), }
 
