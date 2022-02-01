@@ -14,7 +14,7 @@ class HrMessage(models.Model):
     objects = models.Manager()
 
     class Meta:
-        ordering = ('-timestamp',)
+        ordering = ('timestamp',)
 
 
 def __str__(self):
@@ -30,7 +30,7 @@ class TipMessage(models.Model):
     objects = models.Manager()
 
     class Meta:
-        ordering = ('-timestamp',)
+        ordering = ('timestamp',)
 
 
 def __str__(self):

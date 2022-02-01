@@ -15,7 +15,6 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
     const [chat, setChat] = useState({loading: true, data:[]})
     const [title, setTitle] = useState(item.proposed_title)
     const [tip, setTip] = useState(item.proposed_tip)
-
     useEffect(()=>{
         console.log('render chat')
         if(chat.loading)
@@ -23,9 +22,10 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
                 // get messages by id of hr (item is the showed hr)
                 .get(`chat/load-tr-messages/`, {params: {id: item.id}})
                 .then((res) => {
+                    console.log(res.data)
                     setChat({loading: false, data: res.data})
                     res.data.forEach((message)=>{
-                        if(message['isFromSender'] === item.is_sender)
+                        if(message['isFromFarmer'] === !canModify)
                             addUserMessage(message.body)
                         else addResponseMessage(message.body)
                     })

@@ -145,7 +145,7 @@ const HrViewAndChat = ({item, setData, setSelectedHr}) =>{
                     defaultValue={item ? item.content : ""}
                 />
             </Stack>
-            {item.status === 'not_accepted' ?
+            {item.status === 'not_accepted' && !item.is_sender ?
                 <Stack spacing={1} sx={{p: 3, pr: 0}}>
                     <Button variant={"contained"} onClick={handleAccept}>Accept</Button>
                     <Button color="error" variant={"contained"} onClick={handleDecline}>Decline</Button>
@@ -154,6 +154,12 @@ const HrViewAndChat = ({item, setData, setSelectedHr}) =>{
                         setIsClose(true)
                     }}>Decline</Button>*/}
                 </Stack>
+                :item.status === 'not_accepted' && item.is_sender ?
+                    <Stack spacing={1} sx={{ p: 3, pr: 0 , alignItems:"center"}} >
+                        <Typography variant="subtitle1" >
+                            {'This HR is pending, the other farmer need to accept'}
+                        </Typography>
+                    </Stack>
                 : item.status === 'accepted' ?
                     <Stack spacing={1} sx={{p: 3, pr: 0}}>
                         <Button color="error" variant={"contained"} onClick={handleClose}>Close HR</Button>
