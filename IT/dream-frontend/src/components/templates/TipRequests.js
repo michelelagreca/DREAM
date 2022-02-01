@@ -45,8 +45,6 @@ export default function TipRequests({canModify=false}) {
     const [selectedTip, setSelectedTip] = useState(null)
     const [data, setData] = useState({loading: true})
 
-    console.log(selectedTip)
-    console.log(data)
     // get tr requests
     useEffect(()=>{
         if(data.loading)

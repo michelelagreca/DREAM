@@ -13,10 +13,9 @@ import axiosInstance from "../../axios";
 const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
     const [deleteMessages, setDeleteMessages] = useState(0)
     const [chat, setChat] = useState({loading: true, data:[]})
+    const [title, setTitle] = useState(item.proposed_title)
+    const [tip, setTip] = useState(item.proposed_tip)
 
-    console.log(chat)
-    console.log(item)
-    //TODO post chat
     useEffect(()=>{
         console.log('render chat')
         if(chat.loading)
@@ -33,9 +32,8 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
                 })
                 .catch(e=>alert(e))
     }, [chat])
-
-    /*prevent user to write in the chat*/
     useEffect(()=>{
+        /*prevent user to write in the chat*/
         dropMessages()
         chat.data.forEach((message)=>{
             if(message['isFromSender'] === item.is_sender)
@@ -67,26 +65,19 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
 
     const getCustomLauncher = (text="handleToggle",handleToggle) =>
         <Button style={{alignSelf:"flex-end",marginTop:"1rem", marginRight:"1rem",marginBottom:"0.5rem"}} variant={"contained"} onClick={handleToggle}>{text}</Button>
-
     const cleanPage = () =>{
         setData({loading:true})
         setSelectedTip(null)
     }
 
-
-    /*  Possible states TR
-        'pending'
-        'review'
-        'farmer'
-        'declined'
-        'accepted'
-     */
+    // ----- Handle TR state change -----
     const handleAccept = () => {
         const post_obj = {
             tr_id: item.id,
-            status:'farmer'
+            status:'farmer',
+            proposed_title:"",
+            proposed_tip:""
         }
-        console.log(post_obj)
         axiosInstance
             .post(`request/changing_status_tr/`, post_obj)
             .then((res) =>{
@@ -95,13 +86,28 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
             })
             .catch((e)=>alert(e))
     }
-
+    const handleFinalAccept = () => {
+        const post_obj = {
+            tr_id: item.id,
+            status:'accepted',
+            proposed_title:"",
+            proposed_tip:""
+        }
+        axiosInstance
+            .post(`request/changing_status_tr/`, post_obj)
+            .then((res) =>{
+                alert("TR status correctly updated")
+                cleanPage()
+            })
+            .catch((e)=>alert(e))
+    }
     const handleDecline = () => {
         const post_obj = {
             tr_id: item.id,
-            status:'declined'
+            status:'declined',
+            proposed_title:"",
+            proposed_tip:""
         }
-        console.log(post_obj)
         axiosInstance
             .post(`request/changing_status_tr/`, post_obj)
             .then((res) =>{
@@ -110,13 +116,13 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
             })
             .catch((e)=>alert(e))
     }
-
     const handleReview = () => {
         const post_obj = {
             tr_id: item.id,
-            status:'farmer'
+            status:'farmer',
+            proposed_title:title,
+            proposed_tip:tip
         }
-        console.log(post_obj)
         axiosInstance
             .post(`request/changing_status_tr/`, post_obj)
             .then((res) =>{
@@ -125,13 +131,13 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
             })
             .catch((e)=>alert(e))
     }
-
     const handleSubmit = () => {
         const post_obj = {
             tr_id: item.id,
-            status:'review'
+            status:'review',
+            proposed_title:title,
+            proposed_tip:tip
         }
-        console.log(post_obj)
         axiosInstance
             .post(`request/changing_status_tr/`, post_obj)
             .then((res) =>{
@@ -141,6 +147,16 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
             .catch((e)=>alert(e))
     }
 
+    /*
+        Possible states TR
+       'pending'
+       'review'
+       'farmer'
+       'declined'
+       'accepted'
+    */
+
+    // -------------------------------
     return(
         <>
             <Stack spacing={1} sx={{ p: 3, pr: 0 }}>
@@ -148,8 +164,9 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
                     {'Proposed title:'}
                 </Typography>
                 <TextField
+                    onChange={(event)=>setTitle(event.target.value)}
                     disabled={(canModify && item.status === 'review')|| !canModify || item.status === 'declined' || item.status === 'accepted'}
-                    value={item ? item.proposed_title : ""}
+                    value={title}
                 />
             </Stack>
             <Stack spacing={1} sx={{ p: 3, pr: 0 }}>
@@ -161,7 +178,8 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
                     placeholder="Tip content"
                     multiline
                     rows={7}
-                    value={item ? item.proposed_tip : ""}
+                    value={tip}
+                    onChange={(event)=>setTip(event.target.value)}
                 />
             </Stack>
             {
@@ -192,7 +210,7 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
                     </Stack>
                     : !canModify && item.status === 'review' ?
                         <Stack spacing={1} sx={{ p: 3, pr: 0 }}>
-                            <Button variant={"contained"} onClick={handleAccept}>Accept</Button>
+                            <Button variant={"contained"} onClick={handleFinalAccept}>Accept</Button>
                             <Button variant={"contained"} onClick={handleReview}>Require Changes</Button>
                             <Button color="error" variant={"contained"} onClick={handleDecline}>Decline</Button>
                         </Stack>
@@ -203,7 +221,7 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
                 //farmer case
                 canModify && item.status === 'pending' ?
                     <Stack spacing={1} sx={{ p: 3, pr: 0 }}>
-                        <Button variant={"contained"} onClick={handleReview}>Accept</Button>
+                        <Button variant={"contained"} onClick={handleAccept}>Accept</Button>
                         <Button color="error" variant={"contained"} onClick={()=>handleDecline()}>Decline</Button>
                     </Stack>
                     :canModify && item.status === 'farmer' ?
