@@ -1,6 +1,7 @@
 from rest_framework import generics
 from report.models import HarvestReport
 from .serializers import ReportSerializer
+from forum_api.views import FarmerGroupPermission, PolicyMakerGroupPermission
 
 # import here all the needed DB models
 # from forum.models import MODEL_NAME
@@ -11,12 +12,14 @@ from .serializers import ReportSerializer
 
 # ADD HERE GENERIC VIEW FOR DEBUGGING PORPOUSE, THEY ARE INCLUDED IN THE REST FRAMEWORK
 
-class ReportList(generics.ListCreateAPIView):
+class ReportList(generics.ListCreateAPIView, FarmerGroupPermission):
+    permission_classes = [FarmerGroupPermission]
     queryset = HarvestReport.reportobjects.all()
     serializer_class = ReportSerializer
 
 
-class ReportDetail(generics.RetrieveUpdateDestroyAPIView):
+class ReportDetail(generics.RetrieveUpdateDestroyAPIView, FarmerGroupPermission):
+    permission_classes = [FarmerGroupPermission]
     queryset = HarvestReport.reportobjects.all()
     serializer_class = ReportSerializer
 

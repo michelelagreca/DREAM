@@ -22,6 +22,8 @@ from django.db.models import Q
 
 @api_view(['POST'])
 def send_hr_farmer(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     incoming_hr = HRSerializer(data=request.data)
 
     print(f'@ {request.data}')
@@ -78,6 +80,8 @@ def send_hr_farmer(request):
 
 @api_view(['POST'])
 def change_status_hr_farmer(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # pass http request data to custom serializer
     hr_serializer = HRChangeStatusSerializer(data=request.data)
 
@@ -108,6 +112,8 @@ def change_status_hr_farmer(request):
 
 @api_view(['GET'])
 def hr_list_farmer(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # filter hr by user
     qs_dict = HelpRequest.objects.filter(
         Q(author=request.user) | Q(receiver=request.user)).values()  # get queryset in dictionary form
@@ -126,6 +132,8 @@ def hr_list_farmer(request):
 
 @api_view(['POST'])
 def send_tip_request(request):
+    if not request.user.groups.filter(name = "policymaker-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     incoming_tr = TRSerializer(data=request.data)
 
     # print(f'@ {request.data}')
@@ -163,6 +171,8 @@ def send_tip_request(request):
 
 @api_view(['POST'])
 def change_status_tip_request(request):
+    if not request.user.groups.filter(name = "policymaker-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # pass http request data to custom serializer
     tr_serializer = TRChangeStatusSerializer(data=request.data)
     print(request.data)
@@ -224,6 +234,8 @@ def change_status_tip_request(request):
 
 @api_view(['GET'])
 def tr_list_farmer(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # filter hr by user
     qs_dict = TipRequest.objects.filter(receiver=request.user).values()  # get queryset in dictionary form
 
@@ -236,6 +248,8 @@ def tr_list_farmer(request):
 
 @api_view(['GET'])
 def tr_list_policymaker(request):
+    if not request.user.groups.filter(name = "policymaker-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # filter hr by user
     qs_dict = TipRequest.objects.filter(author=request.user).values()  # get queryset in dictionary form
 

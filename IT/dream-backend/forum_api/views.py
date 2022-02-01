@@ -9,13 +9,31 @@ from .serializers import QuestionSerializer, CategorySerializer, TipSerializer, 
 from django.core import serializers
 from django.http import HttpResponse
 from django.db.models import F
-
+from django.core.exceptions import PermissionDenied
+from rest_framework import permissions
 
 # import here all the needed DB models
 # from forum.models import MODEL_NAME
 
 # import serializers fro each model, they are needed to create the endpoints
 # from .serializers import SERIALIZER_NAME
+
+
+class FarmerGroupPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if not request.user.groups.filter(name = "farmer-group").exists():
+        #if not request.user.has_perm('forum.view_answer'):
+        # row above is for check direct permissions
+            raise PermissionDenied
+        return True
+
+
+class PolicyMakerGroupPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if not request.user.groups.filter(name = "policymaker-group").exists():
+            raise PermissionDenied
+        return True
+
 
 
 class CategoryList(generics.ListAPIView):
@@ -26,7 +44,8 @@ class CategoryList(generics.ListAPIView):
 # GET -> list all questions
 # POST -> inserts a question
 
-class QuestionDetail(generics.RetrieveUpdateDestroyAPIView):
+class QuestionDetail(generics.RetrieveUpdateDestroyAPIView, FarmerGroupPermission):
+    permission_classes = [FarmerGroupPermission]
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
 
@@ -36,7 +55,8 @@ class QuestionDetail(generics.RetrieveUpdateDestroyAPIView):
 # DELETE + parameter-> delete the question denoted by the parameter
 
 
-class TipList(generics.ListAPIView):
+class TipList(generics.ListAPIView, FarmerGroupPermission):
+    permission_classes = [FarmerGroupPermission]
     serializer_class = TipSerializer
 
     def get_queryset(self):
@@ -53,7 +73,8 @@ class TipList(generics.ListAPIView):
 
 # GET -> list all tips
 
-class TipDetail(generics.RetrieveUpdateDestroyAPIView):
+class TipDetail(generics.RetrieveUpdateDestroyAPIView, FarmerGroupPermission):
+    permission_classes = [FarmerGroupPermission]
     queryset = Tip.objects.all()
     serializer_class = TipSerializer
 
@@ -62,7 +83,8 @@ class TipDetail(generics.RetrieveUpdateDestroyAPIView):
 # PUT + parameter-> update the tip denoted by the parameter
 # DELETE + parameter-> delete the tip denoted by the parameter
 
-class TipListCategory(generics.ListAPIView):
+class TipListCategory(generics.ListAPIView, FarmerGroupPermission):
+    permission_classes = [FarmerGroupPermission]
     serializer_class = TipSerializer
 
     def get_queryset(self):
@@ -73,7 +95,8 @@ class TipListCategory(generics.ListAPIView):
 # GET + category-> retireve a tip of a specific category
 
 
-class TipListArea(generics.ListAPIView):
+class TipListArea(generics.ListAPIView, FarmerGroupPermission):
+    permission_classes = [FarmerGroupPermission]
     serializer_class = TipSerializer
 
     def get_queryset(self):
@@ -84,7 +107,8 @@ class TipListArea(generics.ListAPIView):
 # GET + area-> retireve a tip of a specific area
 
 
-class AnswerList(generics.ListCreateAPIView):
+class AnswerList(generics.ListCreateAPIView, FarmerGroupPermission):
+    permission_classes = [FarmerGroupPermission]
     queryset = Answer.answerobjects.all()
     serializer_class = AnswerSerializer
 
@@ -93,7 +117,8 @@ class AnswerList(generics.ListCreateAPIView):
 # POST -> inserts a answer
 
 
-class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
+class AnswerDetail(generics.RetrieveUpdateDestroyAPIView, FarmerGroupPermission):
+    permission_classes = [FarmerGroupPermission]
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
 
@@ -107,6 +132,8 @@ class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
 
 @api_view(['GET'])
 def question_list(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     qs_dict = Question.objects.values()  # get queryset in dictionary form
     qs = Question.objects.all()  # get queryset as django queryset
 
@@ -119,6 +146,8 @@ def question_list(request):
 
 @api_view(['GET'])
 def answer_list(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     question_serializer = IdGeneralSerializer(data=request.GET)
 
     # check validation
@@ -149,6 +178,8 @@ def answer_list(request):
 
 @api_view(['GET'])
 def tip_list(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     qs_dict = Tip.objects.values()  # get queryset in dictionary form
     qs = Tip.objects.all()  # get queryset as django queryset
 
@@ -172,6 +203,8 @@ def tip_list(request):
 
 @api_view(['POST'])
 def answer_add(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # pass http request data to custom serializer
     answer_serializer = AnswerSerializer(data=request.data)
 
@@ -203,6 +236,8 @@ def answer_add(request):
 
 @api_view(['POST'])
 def question_add(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # pass http request data to custom serializer
     question_serializer = QuestionSerializer(data=request.data)
 
@@ -230,6 +265,8 @@ def question_add(request):
 
 @api_view(['POST'])
 def tip_add(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # pass http request data to custom serializer
     tip_serializer = TipSerializer(data=request.data)
 
@@ -260,6 +297,8 @@ def tip_add(request):
 
 @api_view(['POST'])
 def tip_like(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # pass http request data to custom serializer
     tip_serializer = TipVoteSerializer(data=request.data)
 
@@ -289,6 +328,8 @@ def tip_like(request):
 
 @api_view(['POST'])
 def tip_dislike(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # pass http request data to custom serializer
     tip_serializer = TipVoteSerializer(data=request.data)
 
@@ -318,6 +359,8 @@ def tip_dislike(request):
 
 @api_view(['POST'])
 def tip_remove_vote(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # pass http request data to custom serializer
     tip_serializer = TipVoteSerializer(data=request.data)
 
@@ -348,6 +391,8 @@ def tip_remove_vote(request):
 
 @api_view(['POST'])
 def answer_like(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     answer_serializer = AnswerVoteSerializer(data=request.data)
 
     # validation
@@ -376,6 +421,8 @@ def answer_like(request):
 
 @api_view(['POST'])
 def answer_dislike(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # pass http request data to custom serializer
     answer_serializer = AnswerVoteSerializer(data=request.data)
 
@@ -405,6 +452,8 @@ def answer_dislike(request):
 
 @api_view(['POST'])
 def answer_remove_vote(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # pass http request data to custom serializer
     answer_serializer = AnswerVoteSerializer(data=request.data)
 
@@ -436,7 +485,8 @@ def answer_remove_vote(request):
 # DELETE + parameter-> delete the answer denoted by the parameter
 
 
-class AnswerListQuestion(generics.ListAPIView):
+class AnswerListQuestion(generics.ListAPIView, FarmerGroupPermission):
+    permission_classes = [FarmerGroupPermission]
     serializer_class = AnswerSerializer
 
     def get_queryset(self):

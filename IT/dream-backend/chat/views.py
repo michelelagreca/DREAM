@@ -12,6 +12,8 @@ from request.models import HelpRequest, TipRequest
 
 @api_view(['GET'])
 def hr_message_list(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     hr_serializer = IdGeneralSerializer(data=request.GET)
 
     # check validation
@@ -39,6 +41,8 @@ def hr_message_list(request):
 
 @api_view(['POST'])
 def hr_message_add(request):
+    if not request.user.groups.filter(name = "farmer-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     message_serializer = HrMessageSerializer(data=request.data)
 
     # check validation
@@ -69,6 +73,8 @@ def hr_message_add(request):
 
 @api_view(['GET'])
 def tip_message_list(request):
+    if not request.user.groups.filter(name = "farmer-group").exists() and not request.user.groups.filter(name = "policymaker-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     tip_serializer = IdGeneralSerializer(data=request.GET)
 
     # check validation
@@ -96,6 +102,8 @@ def tip_message_list(request):
 
 @api_view(['POST'])
 def tip_message_add(request):
+    if not request.user.groups.filter(name = "farmer-group").exists() and not request.user.groups.filter(name = "policymaker-group").exists():
+        return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     message_serializer = TipMessageSerializer(data=request.data)
 
     # check validation
