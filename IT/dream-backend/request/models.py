@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils import timezone
+
+from forum.models import Category
 from users.models import CustomUser
 
 HR_OPTIONS_EXT = [
@@ -65,6 +67,8 @@ class TipRequest(models.Model):
         CustomUser, on_delete=models.PROTECT, related_name='tiprequest_receiver')
     status = models.CharField(
         max_length=20, choices=TIP_OPTIONS, default='not_accepted')
+    category = models.ForeignKey(
+        Category, on_delete=models.PROTECT, blank=False)
 
     objects = models.Manager()  # default manager
 

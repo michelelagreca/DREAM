@@ -2,6 +2,8 @@ import math
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
+
+from forum.models import Tip
 from request.models import HelpRequest, HR_OPTIONS_EXT, TipRequest, TR_OPTIONS_EXT
 from users.models import CustomUser
 from .serializers import HRSerializer, HRChangeStatusSerializer, TRSerializer, TRChangeStatusSerializer
@@ -149,6 +151,7 @@ def send_tip_request(request):
     new_request = TipRequest(
         proposed_title=incoming_tr.validated_data['proposed_title'],
         proposed_tip=incoming_tr.validated_data['proposed_tip'],
+        category=incoming_tr.validated_data['category'],
         author=request.user,
         receiver=farmer,
         status='pending'
@@ -186,7 +189,7 @@ def change_status_tip_request(request):
     except TipRequest.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    print(f'old: ${tr.status} ${tr.proposed_title} ${tr.proposed_tip}')
+    print(f'old: ${tr.status} ')
 
     if request.user != tr.author and request.user != tr.receiver:
         return Response(data="You cannot modify this tr", status=status.HTTP_401_UNAUTHORIZED)
@@ -203,6 +206,18 @@ def change_status_tip_request(request):
 
     tr.status = tr_status
     tr.save()
+
+    # intercept changing od status from review to accepted made by policymakers
+    if request.user == tr.author and tr.status == 'review' and tr.status == 'accepted':
+        tip = Tip(
+            title=tr.proposed_title,
+            text_body=tr.proposed_tip,
+            author=tr.receiver,
+            category=tr.category,
+            area=tr.receiver.area,
+            is_star=False,
+        )
+        tip.save()
 
     return Response(data="TR status updated", status=status.HTTP_200_OK)
 

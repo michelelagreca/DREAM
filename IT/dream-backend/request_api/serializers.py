@@ -27,4 +27,4 @@ class TRChangeStatusSerializer(serializers.Serializer):
 class TRSerializer(serializers.ModelSerializer):
     class Meta:
         model = TipRequest
-        fields = ('id', 'proposed_title', 'proposed_tip', 'status', 'receiver')
+        fields = ('id', 'proposed_title', 'proposed_tip', 'status', 'receiver', 'category')

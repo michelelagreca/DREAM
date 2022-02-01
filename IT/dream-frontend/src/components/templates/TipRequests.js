@@ -11,10 +11,10 @@ import axiosInstance from "../../axios";
 import CircularProgressCenter from "../molecules/CircularProgressCenter";
 
 
-function TrItem({ tr, setSelectedTr, isPolicyMaker }) {
+function TrItem({ tr, setSelectedTr, isPolicyMaker, key }) {
     const { proposed_title, proposed_tip, timestamp, status} = tr;
     return (
-        <Stack direction="row" alignItems="center" spacing={2} justifyContent={"space-between"}>
+        <Stack key={key} direction="row" alignItems="center" spacing={2} justifyContent={"space-between"}>
             <Stack direction="row" alignItems="center">
                 <Icon
                     icon={isPolicyMaker ? send : receive}

@@ -51,6 +51,7 @@ class BlacklistTokenUpdateView(APIView):
 
 @api_view(['GET'])
 def user_info(request):
+
     if request.user.is_anonymous:
         return Response(data=[], status=status.HTTP_200_OK)
 

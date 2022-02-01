@@ -75,8 +75,8 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
         const post_obj = {
             tr_id: item.id,
             status:'farmer',
-            proposed_title:"",
-            proposed_tip:""
+            proposed_title:"a",
+            proposed_tip:"a"
         }
         axiosInstance
             .post(`request/changing_status_tr/`, post_obj)
@@ -90,8 +90,8 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
         const post_obj = {
             tr_id: item.id,
             status:'accepted',
-            proposed_title:"",
-            proposed_tip:""
+            proposed_title:"a",
+            proposed_tip:"a"
         }
         axiosInstance
             .post(`request/changing_status_tr/`, post_obj)
@@ -105,8 +105,8 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
         const post_obj = {
             tr_id: item.id,
             status:'declined',
-            proposed_title:"",
-            proposed_tip:""
+            proposed_title:"a",
+            proposed_tip:"a"
         }
         axiosInstance
             .post(`request/changing_status_tr/`, post_obj)
