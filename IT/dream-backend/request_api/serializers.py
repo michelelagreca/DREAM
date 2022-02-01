@@ -20,6 +20,8 @@ class HRChangeStatusSerializer(serializers.Serializer):
 class TRChangeStatusSerializer(serializers.Serializer):
     tr_id = serializers.IntegerField()
     status = serializers.CharField(max_length=20)
+    proposed_title = serializers.CharField(max_length=250)
+    proposed_tip = serializers.CharField(max_length=250)
 
 
 class TRSerializer(serializers.ModelSerializer):

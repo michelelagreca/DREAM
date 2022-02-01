@@ -23,68 +23,6 @@ class CategoryList(generics.ListAPIView):
     serializer_class = CategorySerializer
 
 
-@api_view(['GET'])
-def question_list(request):
-    qs_dict = Question.objects.values()  # get queryset in dictionary form
-    qs = Question.objects.all()  # get queryset as django queryset
-
-    for i in range(len(qs_dict)):  # complete the dictionary with info extracted by the queryset
-        answers_dic = Answer.objects.filter(question=qs[i]).values()
-        qs_dict[i]['answers_number'] = len(answers_dic)  # count related answers
-
-    return Response(data=qs_dict, status=status.HTTP_200_OK, content_type='application/json')
-
-
-@api_view(['GET'])
-def answer_list(request):
-    question_serializer = IdGeneralSerializer(data=request.GET)
-
-    # check validation
-    if not question_serializer.is_valid():
-        return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
-
-    # read validated data
-    question_id = question_serializer.validated_data["id"]
-
-    # get answers
-    qs = Answer.objects.filter(question_id=question_id)
-    qs_dict = Answer.objects.filter(question_id=question_id).values()
-
-    for i in range(len(qs_dict)):  # complete the dictionary with info extracted by the queryset
-        qs_dict[i]['user_like'] = False
-        qs_dict[i]['user_dislike'] = False
-
-        if request.user in qs[i].likes.all():
-            qs_dict[i]['user_like'] = True
-        if request.user in qs[i].dislikes.all():
-            qs_dict[i]['user_dislike'] = True
-
-        qs_dict[i]['likes'] = len(qs[i].likes.values())
-        qs_dict[i]['dislikes'] = len(qs[i].dislikes.values())
-
-    return Response(data=qs_dict, status=status.HTTP_200_OK, content_type='application/json')
-
-
-@api_view(['GET'])
-def tip_list(request):
-    qs_dict = Tip.objects.values()  # get queryset in dictionary form
-    qs = Tip.objects.all()  # get queryset as django queryset
-
-    for i in range(len(qs_dict)):  # complete the dictionary with info extracted by the queryset
-        qs_dict[i]['user_like'] = False
-        qs_dict[i]['user_dislike'] = False
-
-        if request.user in qs[i].likes.all():
-            qs_dict[i]['user_like'] = True
-        if request.user in qs[i].dislikes.all():
-            qs_dict[i]['user_dislike'] = True
-
-        qs_dict[i]['likes'] = len(qs[i].likes.values())
-        qs_dict[i]['dislikes'] = len(qs[i].dislikes.values())
-
-    return Response(data=qs_dict, status=status.HTTP_200_OK, content_type='application/json')
-
-
 # GET -> list all questions
 # POST -> inserts a question
 
@@ -164,6 +102,74 @@ class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
 # DOC django rest HTTP: https://www.django-rest-framework.org/tutorial/2-requests-and-responses/
 
 
+# ------------- FORUM READING -------------
+
+
+@api_view(['GET'])
+def question_list(request):
+    qs_dict = Question.objects.values()  # get queryset in dictionary form
+    qs = Question.objects.all()  # get queryset as django queryset
+
+    for i in range(len(qs_dict)):  # complete the dictionary with info extracted by the queryset
+        answers_dic = Answer.objects.filter(question=qs[i]).values()
+        qs_dict[i]['answers_number'] = len(answers_dic)  # count related answers
+
+    return Response(data=qs_dict, status=status.HTTP_200_OK, content_type='application/json')
+
+
+@api_view(['GET'])
+def answer_list(request):
+    question_serializer = IdGeneralSerializer(data=request.GET)
+
+    # check validation
+    if not question_serializer.is_valid():
+        return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
+
+    # read validated data
+    question_id = question_serializer.validated_data["id"]
+
+    # get answers
+    qs = Answer.objects.filter(question_id=question_id)
+    qs_dict = Answer.objects.filter(question_id=question_id).values()
+
+    for i in range(len(qs_dict)):  # complete the dictionary with info extracted by the queryset
+        qs_dict[i]['user_like'] = False
+        qs_dict[i]['user_dislike'] = False
+
+        if request.user in qs[i].likes.all():
+            qs_dict[i]['user_like'] = True
+        if request.user in qs[i].dislikes.all():
+            qs_dict[i]['user_dislike'] = True
+
+        qs_dict[i]['likes'] = len(qs[i].likes.values())
+        qs_dict[i]['dislikes'] = len(qs[i].dislikes.values())
+
+    return Response(data=qs_dict, status=status.HTTP_200_OK, content_type='application/json')
+
+
+@api_view(['GET'])
+def tip_list(request):
+    qs_dict = Tip.objects.values()  # get queryset in dictionary form
+    qs = Tip.objects.all()  # get queryset as django queryset
+
+    for i in range(len(qs_dict)):  # complete the dictionary with info extracted by the queryset
+        qs_dict[i]['user_like'] = False
+        qs_dict[i]['user_dislike'] = False
+
+        if request.user in qs[i].likes.all():
+            qs_dict[i]['user_like'] = True
+        if request.user in qs[i].dislikes.all():
+            qs_dict[i]['user_dislike'] = True
+
+        qs_dict[i]['likes'] = len(qs[i].likes.values())
+        qs_dict[i]['dislikes'] = len(qs[i].dislikes.values())
+
+    return Response(data=qs_dict, status=status.HTTP_200_OK, content_type='application/json')
+
+
+# ------------- FORUM POSTING -------------
+
+
 @api_view(['POST'])
 def answer_add(request):
     # pass http request data to custom serializer
@@ -219,16 +225,14 @@ def question_add(request):
     )
     question.save()
 
-    return Response(data="Like sent", status=status.HTTP_200_OK)
+    return Response(data="Question sent", status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 def tip_add(request):
     # pass http request data to custom serializer
     tip_serializer = TipSerializer(data=request.data)
-    print(request.data)
-    print(tip_serializer.is_valid())
-    print(request.user.area)
+
     # check validation
     if not tip_serializer.is_valid():
         return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
@@ -249,8 +253,10 @@ def tip_add(request):
     )
     tip.save()
 
-    return Response(data="Like sent", status=status.HTTP_200_OK)
+    return Response(data="Tip posted", status=status.HTTP_200_OK)
 
+
+# ------------- TIP VOTING -------------
 
 @api_view(['POST'])
 def tip_like(request):
@@ -311,6 +317,36 @@ def tip_dislike(request):
 
 
 @api_view(['POST'])
+def tip_remove_vote(request):
+    # pass http request data to custom serializer
+    tip_serializer = TipVoteSerializer(data=request.data)
+
+    # check validation
+    if not tip_serializer.is_valid():
+        return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
+
+    # how to read validated data
+    tip_id = tip_serializer.validated_data["tip_id"]
+
+    try:
+        tip = Tip.objects.get(pk=tip_id)
+    except Tip.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.user in tip.dislikes.all():
+        tip.dislikes.remove(request.user)  # remove from dislike relation if present
+
+    if request.user in tip.likes.all():
+        tip.likes.remove(request.user)  # remove from like relation if present
+
+    tip.save()
+
+    return Response(data="DisLike sent", status=status.HTTP_200_OK)
+
+
+# ------------- ANSWER VOTING -------------
+
+@api_view(['POST'])
 def answer_like(request):
     answer_serializer = AnswerVoteSerializer(data=request.data)
 
@@ -362,6 +398,34 @@ def answer_dislike(request):
         answer.likes.remove(request.user)  # remove from like relation if present
 
     answer.dislikes.add(request.user)
+    answer.save()
+
+    return Response(data="DisLike sent", status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def answer_remove_vote(request):
+    # pass http request data to custom serializer
+    answer_serializer = AnswerVoteSerializer(data=request.data)
+
+    # check validation
+    if not answer_serializer.is_valid():
+        return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
+
+    # how to read validated data
+    answer_id = answer_serializer.validated_data["answer_id"]
+
+    try:
+        answer = Answer.objects.get(pk=answer_id)
+    except Answer.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.user in answer.dislikes.all():
+        answer.dislikes.remove(request.user)  # remove from dislike relation if present
+
+    if request.user in answer.likes.all():
+        answer.likes.remove(request.user)  # remove from like relation if present
+
     answer.save()
 
     return Response(data="DisLike sent", status=status.HTTP_200_OK)

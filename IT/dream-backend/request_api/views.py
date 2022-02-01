@@ -162,7 +162,8 @@ def send_tip_request(request):
 def change_status_tip_request(request):
     # pass http request data to custom serializer
     tr_serializer = TRChangeStatusSerializer(data=request.data)
-
+    print(request.data)
+    print(tr_serializer.is_valid())
     # check validation
     if not tr_serializer.is_valid():
         return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
@@ -170,6 +171,10 @@ def change_status_tip_request(request):
     # read validated data
     tr_id = tr_serializer.validated_data["tr_id"]
     tr_status = tr_serializer.validated_data["status"]
+    tr_proposed_title = tr_serializer.validated_data["proposed_title"]
+    tr_proposed_tip = tr_serializer.validated_data["proposed_tip"]
+
+    print(f'new : ${tr_serializer.validated_data}')
 
     # check option validity
     if tr_status not in TR_OPTIONS_EXT:
@@ -181,8 +186,20 @@ def change_status_tip_request(request):
     except TipRequest.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+    print(f'old: ${tr.status} ${tr.proposed_title} ${tr.proposed_tip}')
+
     if request.user != tr.author and request.user != tr.receiver:
         return Response(data="You cannot modify this tr", status=status.HTTP_401_UNAUTHORIZED)
+
+    # intercept the policymaker request for modification tr.status is the old status
+    if request.user == tr.author and tr.status == 'review' and tr_status == 'farmer':
+        tr.proposed_title = tr_proposed_title
+        tr.proposed_tip = tr_proposed_tip
+
+    # intercept the farmer request to review
+    if request.user == tr.receiver and tr.status == 'farmer' and tr_status == 'review':
+        tr.proposed_title = tr_proposed_title
+        tr.proposed_tip = tr_proposed_tip
 
     tr.status = tr_status
     tr.save()
