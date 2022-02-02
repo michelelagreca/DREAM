@@ -1,10 +1,9 @@
-from django.urls import include, path, reverse
+from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase, URLPatternsTestCase, APIRequestFactory, force_authenticate
+from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
 from django.contrib.auth.models import Group
-
 from chat.models import HrMessage, TipMessage
-from chat.views import hr_message_list, tip_message_list
+from chat.views import hr_message_list, tip_message_list, hr_message_add, tip_message_add
 from forum.models import Category
 from request.models import HelpRequest, TipRequest
 from users.models import CustomUser
@@ -130,6 +129,28 @@ class MessagesTestes(APITestCase):
         )
         self.mr2.save()
 
+    def test_hr_message_to_string(self):
+        """
+        Ensure HR message conversion to string:
+        """
+        m3 = HrMessage(
+            body='111',
+            isFromSender=False,
+            reference_hr=self.hr1
+        )
+        self.assertEqual(str(m3), '111')
+
+    def test_tr_message_to_string(self):
+        """
+            TR message conversion to string:
+        """
+        m4 = TipMessage(
+            body='222',
+            isFromFarmer=False,
+            reference_tip=self.tr1
+        )
+        self.assertEqual(str(m4), '222')
+
     def test_load_hr(self):
         """
         Ensure only participants can load HR messages.
@@ -177,6 +198,72 @@ class MessagesTestes(APITestCase):
         response = hr_message_list(request)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_send_hr_messages(self):
+        """
+        Ensure only participants can send HR messages.
+        """
+        url = reverse('chat:hrmessagecreate')
+
+        # try access as anonymous
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # try bad formatted request
+        request = self.factory.post(url)
+        force_authenticate(request, user=self.f1)
+        response = hr_message_add(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # try to send invalid reference hr
+        data = {'reference_hr': 10, 'body': 'aa'}
+        request = self.factory.post(url, data, format='json')
+        force_authenticate(request, user=self.f1)
+        response = hr_message_add(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # message from unauthorized user
+        data = {'reference_hr': self.hr1.id, 'body': 'aa'}
+        request = self.factory.post(url, data, format='json')
+        force_authenticate(request, user=self.f3)
+        response = hr_message_add(request)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # try to send message (f1 f2) and verify it's saved
+        data = {'reference_hr': self.hr1.id, 'body': 'aa'}
+        request = self.factory.post(url, data, format='json')
+        force_authenticate(request, user=self.f1)
+        response = hr_message_add(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        request = self.factory.get(url + '/?id=1')
+        force_authenticate(request, user=self.f1)
+        response = hr_message_list(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3)  # +1 message
+
+        request = self.factory.post(url, data, format='json')
+        force_authenticate(request, user=self.f2)
+        response = hr_message_add(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        request = self.factory.get(url + '/?id=1')
+        force_authenticate(request, user=self.f2)
+        response = hr_message_list(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 4)  # +2 message
+
+        # try to send message to a non accepted hr
+        self.hr1.status = 'not accepted'
+        self.hr1.save()
+        data = {'reference_hr': self.hr1.id, 'body': 'aa'}
+        request = self.factory.post(url, data, format='json')
+        force_authenticate(request, user=self.f1)
+        response = hr_message_add(request)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        request = self.factory.get(url + '/?id=1')
+        force_authenticate(request, user=self.f1)
+        response = hr_message_list(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 4)  # number of message as before
+
     def test_load_tr(self):
         """
         Ensure only participants can load TR messages.
@@ -223,3 +310,69 @@ class MessagesTestes(APITestCase):
         force_authenticate(request, user=self.p1)
         response = tip_message_list(request)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_send_tip_messages(self):
+        """
+        Ensure only participants can send TR messages.
+        """
+        url = reverse('chat:trmessagecreate')
+
+        # try access as anonymous
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # try bad formatted request
+        request = self.factory.post(url)
+        force_authenticate(request, user=self.f3)
+        response = tip_message_add(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # try to send invalid reference tip
+        data = {'reference_tip': 10, 'body': 'aa'}
+        request = self.factory.post(url, data, format='json')
+        force_authenticate(request, user=self.f3)
+        response = tip_message_add(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # message from unauthorized user
+        data = {'reference_tip': self.tr1.id, 'body': 'aa'}
+        request = self.factory.post(url, data, format='json')
+        force_authenticate(request, user=self.f1)
+        response = tip_message_add(request)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # try to send message (p1 f3) and verify it's saved
+        data = {'reference_tip': self.tr1.id, 'body': 'aa'}
+        request = self.factory.post(url, data, format='json')
+        force_authenticate(request, user=self.f3)
+        response = tip_message_add(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        request = self.factory.get(url + '/?id=1')
+        force_authenticate(request, user=self.f3)
+        response = tip_message_list(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3)  # +1 message
+
+        request = self.factory.post(url, data, format='json')
+        force_authenticate(request, user=self.p1)
+        response = tip_message_add(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        request = self.factory.get(url + '/?id=1')
+        force_authenticate(request, user=self.p1)
+        response = tip_message_list(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 4)  # +2 message
+
+        # try to send message to a declined tr chat
+        self.tr1.status = 'declined'
+        self.tr1.save()
+        data = {'reference_tip': self.tr1.id, 'body': 'aa'}
+        request = self.factory.post(url, data, format='json')
+        force_authenticate(request, user=self.f3)
+        response = tip_message_add(request)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        request = self.factory.get(url + '/?id=1')
+        force_authenticate(request, user=self.f3)
+        response = tip_message_list(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 4)  # number of message as before
