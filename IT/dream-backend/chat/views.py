@@ -1,7 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import generics, status
-
 from chat.models import HrMessage, TipMessage
 from chat.serializers import HrMessageSerializer, TipMessageSerializer
 from core.serializers import IdGeneralSerializer
@@ -12,7 +11,7 @@ from request.models import HelpRequest, TipRequest
 
 @api_view(['GET'])
 def hr_message_list(request):
-    if not request.user.groups.filter(name = "farmer-group").exists():
+    if not request.user.groups.filter(name="farmer-group").exists():
         return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     hr_serializer = IdGeneralSerializer(data=request.GET)
 
@@ -41,7 +40,7 @@ def hr_message_list(request):
 
 @api_view(['POST'])
 def hr_message_add(request):
-    if not request.user.groups.filter(name = "farmer-group").exists():
+    if not request.user.groups.filter(name="farmer-group").exists():
         return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     message_serializer = HrMessageSerializer(data=request.data)
 
@@ -73,7 +72,8 @@ def hr_message_add(request):
 
 @api_view(['GET'])
 def tip_message_list(request):
-    if not request.user.groups.filter(name = "farmer-group").exists() and not request.user.groups.filter(name = "policymaker-group").exists():
+    if not request.user.groups.filter(name="farmer-group").exists() and not request.user.groups.filter(
+            name="policymaker-group").exists():
         return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     tip_serializer = IdGeneralSerializer(data=request.GET)
 
@@ -87,7 +87,7 @@ def tip_message_list(request):
     # try to get reference hr
     try:
         tip = TipRequest.objects.get(pk=tip_id)
-    except HelpRequest.DoesNotExist:
+    except TipRequest.DoesNotExist:
         return Response(data="Tip not found", status=status.HTTP_404_NOT_FOUND)
 
     # check if either the user is the author or the receiver
@@ -102,7 +102,8 @@ def tip_message_list(request):
 
 @api_view(['POST'])
 def tip_message_add(request):
-    if not request.user.groups.filter(name = "farmer-group").exists() and not request.user.groups.filter(name = "policymaker-group").exists():
+    if not request.user.groups.filter(name="farmer-group").exists() and not request.user.groups.filter(
+            name="policymaker-group").exists():
         return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     message_serializer = TipMessageSerializer(data=request.data)
 
