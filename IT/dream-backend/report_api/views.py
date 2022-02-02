@@ -18,7 +18,7 @@ class ReportList(generics.ListCreateAPIView, FarmerGroupPermission):
     serializer_class = ReportSerializer
 
 
-class ReportDetail(generics.RetrieveUpdateDestroyAPIView, FarmerGroupPermission):
+class ReportDetail(generics.RetrieveAPIView, FarmerGroupPermission):
     permission_classes = [FarmerGroupPermission]
     queryset = HarvestReport.reportobjects.all()
     serializer_class = ReportSerializer

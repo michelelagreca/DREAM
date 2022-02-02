@@ -11,4 +11,4 @@ from report.models import HarvestReport
 class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = HarvestReport
-        fields = ('firstname', 'lastname', 'date', 'author', 'status')
+        fields = ('id', 'date', 'area', 'category', 'cropName', 'quantity', 'genericProblems', 'weatherProblems', 'author')

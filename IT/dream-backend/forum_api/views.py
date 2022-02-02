@@ -44,7 +44,7 @@ class CategoryList(generics.ListAPIView):
 # GET -> list all questions
 # POST -> inserts a question
 
-class QuestionDetail(generics.RetrieveUpdateDestroyAPIView, FarmerGroupPermission):
+class QuestionDetail(generics.RetrieveAPIView, FarmerGroupPermission):
     permission_classes = [FarmerGroupPermission]
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
@@ -73,7 +73,7 @@ class TipList(generics.ListAPIView, FarmerGroupPermission):
 
 # GET -> list all tips
 
-class TipDetail(generics.RetrieveUpdateDestroyAPIView, FarmerGroupPermission):
+class TipDetail(generics.RetrieveAPIView, FarmerGroupPermission):
     permission_classes = [FarmerGroupPermission]
     queryset = Tip.objects.all()
     serializer_class = TipSerializer
@@ -117,7 +117,7 @@ class AnswerList(generics.ListCreateAPIView, FarmerGroupPermission):
 # POST -> inserts a answer
 
 
-class AnswerDetail(generics.RetrieveUpdateDestroyAPIView, FarmerGroupPermission):
+class AnswerDetail(generics.RetrieveAPIView, FarmerGroupPermission):
     permission_classes = [FarmerGroupPermission]
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer

@@ -10,7 +10,7 @@ from forum.models import Category
 class HarvestReport(models.Model):
     class ReportObjects(models.Manager):
         def get_queryset(self):
-            return super().get_queryset().filter(status='published')
+            return super().get_queryset()
 
     firstName = models.CharField(max_length=50)
     lastName = models.CharField(max_length=50)
