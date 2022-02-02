@@ -87,7 +87,7 @@ class CustomAccountManager(BaseUserManager):
         # call to the function below, basically a super user is a normal user
         return self.create_user(email=email, password=password, **other_fields)
 
-    def create_user(self, email, user_name, first_name, last_name, auth_code, password, **other_fields):
+    def create_user(self, email, role, user_name, first_name, last_name, auth_code, password, **other_fields):
 
         if not email:
             raise ValueError('You must provide an email address')
