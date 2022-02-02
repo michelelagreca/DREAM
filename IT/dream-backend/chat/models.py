@@ -16,9 +16,8 @@ class HrMessage(models.Model):
     class Meta:
         ordering = ('timestamp',)
 
-
-def __str__(self):
-    return self.body
+    def __str__(self):
+        return self.body
 
 
 class TipMessage(models.Model):
@@ -29,9 +28,9 @@ class TipMessage(models.Model):
 
     objects = models.Manager()
 
+    def __str__(self):
+        return self.body
+
     class Meta:
         ordering = ('timestamp',)
 
-
-def __str__(self):
-    return self.body

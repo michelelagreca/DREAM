@@ -51,6 +51,10 @@ def hr_message_add(request):
     # read validated data
     hr_ref = message_serializer.validated_data["reference_hr"]
 
+    # check acceptance of hr
+    if hr_ref.status != 'accepted':
+        return Response(data="Message not allowed", status=status.HTTP_403_FORBIDDEN)
+
     # check if either the user is the author or the receiver
     is_from_sender = False
     if hr_ref.author == request.user:
@@ -120,6 +124,10 @@ def tip_message_add(request):
         is_from_farmer = True
     elif tip_ref.author != request.user and tip_ref.receiver != request.user:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    # check acceptance of tr
+    if tip_ref.status == 'declined' or tip_ref.status == 'pending':
+        return Response(data="Message not allowed", status=status.HTTP_403_FORBIDDEN)
 
     message = TipMessage(
         body=message_serializer.validated_data['body'],
