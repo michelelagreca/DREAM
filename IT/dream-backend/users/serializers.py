@@ -80,7 +80,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 checkUserAuthCode(user_data=data, code_object=auth_code_object)
                 data['district'] = auth_code_object.district    # assign auth code district to policymaker
             except AuthCodePolicyMaker.DoesNotExist:
-                raise serializers.ValidationError("Invalid policy maker authorization code")
+                raise serializers.ValidationError("Invalid policymaker authorization code")
 
         return data
 
