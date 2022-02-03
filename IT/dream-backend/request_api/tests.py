@@ -612,3 +612,7 @@ class RequestTestes(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(TipRequest.objects.get(pk=self.tr1.id).proposed_title, new_title)
         self.assertEqual(TipRequest.objects.get(pk=self.tr1.id).proposed_tip, new_tip)
+
+    def test_request_string(self):
+        self.assertEqual(str(self.tr1), "1 t")
+        self.assertEqual(str(self.hr1), "1 t")
