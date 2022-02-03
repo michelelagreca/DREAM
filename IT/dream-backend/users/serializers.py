@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import CustomUser, AuthCodeAgronomist, AuthCodeFarmer, AuthCodePolicyMaker
+from django.contrib.auth.models import Group
 
 
 # Serializers are used to bind routes together with data from the DB
@@ -108,9 +109,18 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
         # save password hashed
         user.set_password(validated_data['password'])
+
+        # group association
+        if validated_data['role'] == 'farmer':
+            my_group = Group.objects.get(name='farmer-group')
+            my_group.user_set.add(user)
+        elif validated_data['role'] == 'policymaker':
+            my_group = Group.objects.get(name='policymaker-group')
+            my_group.user_set.add(user)
+
         user.save()
 
         # disable authcode
         disableAuthCode(data=validated_data)
-        print("@@ Serializer execution...")
+        # print("@@ Serializer execution...")
         return user
