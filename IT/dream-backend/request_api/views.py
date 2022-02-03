@@ -2,7 +2,6 @@ import math
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
-
 from forum.models import Tip
 from request.models import HelpRequest, HR_OPTIONS_EXT, TipRequest, TR_OPTIONS_EXT
 from users.models import CustomUser
@@ -10,29 +9,18 @@ from .serializers import HRSerializer, HRChangeStatusSerializer, TRSerializer, T
 from django.db.models import Q
 
 
-# import here all the needed DB models
-# from forum.models import MODEL_NAME
-
-# import serializers fro each model, they are needed to create the endpoints
-# from .serializers import SERIALIZER_NAME
-
-
 # --------------  HELP REQUEST  --------------
 
 
 @api_view(['POST'])
 def send_hr_farmer(request):
-    if not request.user.groups.filter(name = "farmer-group").exists():
+    if not request.user.groups.filter(name="farmer-group").exists():
         return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
+
     incoming_hr = HRSerializer(data=request.data)
 
-    print(f'@ {request.data}')
-    print(f'@ {incoming_hr.is_valid()}')
     if not incoming_hr.is_valid():
         return Response(data="Invalid Request", status=status.HTTP_400_BAD_REQUEST)
-
-    if not request.user.role == 'farmer':
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     sender_lat = request.user.latitude
     sender_long = request.user.longitude
@@ -60,14 +48,10 @@ def send_hr_farmer(request):
     if len(hr_receivers) <= 0:
         return Response(data="No farmer nearby", status=status.HTTP_204_NO_CONTENT)
 
-    # TODO manage timestamp
     for receiver_user in hr_receivers:
         new_request = HelpRequest(
             title=incoming_hr.validated_data['title'],
-            # timestamp=incoming_hr.validated_data['timestamp'],
             content=incoming_hr.validated_data['content'],
-            # slug=incoming_hr.validated_data['slug'],
-            # published=incoming_hr.validated_data['published'],
             author=request.user,
             receiver=receiver_user,
             status='not_accepted'
@@ -80,7 +64,7 @@ def send_hr_farmer(request):
 
 @api_view(['POST'])
 def change_status_hr_farmer(request):
-    if not request.user.groups.filter(name = "farmer-group").exists():
+    if not request.user.groups.filter(name="farmer-group").exists():
         return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # pass http request data to custom serializer
     hr_serializer = HRChangeStatusSerializer(data=request.data)
@@ -101,8 +85,21 @@ def change_status_hr_farmer(request):
     except HelpRequest.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+    # prevent modification of a closed/declined hr
+    if hr.status == 'closed' or hr.status == 'declined':
+        return Response("Invalid Option", status=status.HTTP_403_FORBIDDEN)
+
+    # allow declination only if the request is not-accepted
+    if hr.status != 'not_accepted' and hr_status == 'declined':
+        return Response("Invalid Option", status=status.HTTP_403_FORBIDDEN)
+
+    # prevent access to not sender or not receiver
     if request.user != hr.author and request.user != hr.receiver:
         return Response(data="You cannot modify this hr", status=status.HTTP_401_UNAUTHORIZED)
+
+    # author cannot accept his own hr
+    if hr_status == 'accepted' and request.user == hr.author:
+        return Response("Invalid Option", status=status.HTTP_403_FORBIDDEN)
 
     hr.status = hr_status
     hr.save()
@@ -112,7 +109,7 @@ def change_status_hr_farmer(request):
 
 @api_view(['GET'])
 def hr_list_farmer(request):
-    if not request.user.groups.filter(name = "farmer-group").exists():
+    if not request.user.groups.filter(name="farmer-group").exists():
         return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # filter hr by user
     qs_dict = HelpRequest.objects.filter(
@@ -132,27 +129,18 @@ def hr_list_farmer(request):
 
 @api_view(['POST'])
 def send_tip_request(request):
-    if not request.user.groups.filter(name = "policymaker-group").exists():
+    if not request.user.groups.filter(name="policymaker-group").exists():
         return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     incoming_tr = TRSerializer(data=request.data)
-
-    # print(f'@ {request.data}')
-    # print(f'@ {incoming_hr.is_valid()}')
 
     if not incoming_tr.is_valid():
         return Response(data="Invalid Request", status=status.HTTP_400_BAD_REQUEST)
 
-    if not request.user.role == 'policymaker':
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
-
     # try to get farmer associated to the request
-    try:
-        farmer = CustomUser.objects.get(role=incoming_tr.validated_data['receiver'])
-    except CustomUser.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    farmer = incoming_tr.validated_data['receiver']
 
     # farmer belong to a district where the policy maker is not in charge
-    if farmer.zone.district != request.user.district:
+    if farmer.area.district != request.user.district:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     # creation and save
@@ -171,12 +159,12 @@ def send_tip_request(request):
 
 @api_view(['POST'])
 def change_status_tip_request(request):
-    if not request.user.groups.filter(name = "policymaker-group").exists():
+    if not request.user.groups.filter(name="policymaker-group").exists() and not request.user.groups.filter(
+            name="farmer-group").exists():
         return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # pass http request data to custom serializer
     tr_serializer = TRChangeStatusSerializer(data=request.data)
-    print(request.data)
-    print(tr_serializer.is_valid())
+
     # check validation
     if not tr_serializer.is_valid():
         return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
@@ -186,8 +174,6 @@ def change_status_tip_request(request):
     tr_status = tr_serializer.validated_data["status"]
     tr_proposed_title = tr_serializer.validated_data["proposed_title"]
     tr_proposed_tip = tr_serializer.validated_data["proposed_tip"]
-
-    print(f'new : ${tr_serializer.validated_data}')
 
     # check option validity
     if tr_status not in TR_OPTIONS_EXT:
@@ -199,10 +185,29 @@ def change_status_tip_request(request):
     except TipRequest.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    print(f'old: ${tr.status} ')
+    # prevent access to accepted/declined tr
+    if tr.status == 'declined' or tr.status == 'accepted':
+        return Response(data="You cannot modify this tr", status=status.HTTP_403_FORBIDDEN)
 
+    # allow access only to author and receiver
     if request.user != tr.author and request.user != tr.receiver:
         return Response(data="You cannot modify this tr", status=status.HTTP_401_UNAUTHORIZED)
+
+    # prevent farmer to accept
+    if request.user == tr.receiver and tr_status == 'accepted':
+        return Response(data="You cannot modify this tr", status=status.HTTP_403_FORBIDDEN)
+
+    # prevent policymaker to accept with any farmer approval
+    if request.user == tr.author and tr_status == 'accepted' and (tr.status == 'pending' or tr.status == 'farmer'):
+        return Response(data="You cannot modify this tr", status=status.HTTP_403_FORBIDDEN)
+
+    # prevent policy maker to rollback the farmer state
+    if request.user == tr.author and tr_status == 'review':
+        return Response(data="You cannot modify this tr", status=status.HTTP_403_FORBIDDEN)
+
+    # prevent farmer to rollback the review state (but allow it for acceptance of pending requests)
+    if request.user == tr.receiver and tr_status == 'farmer' and tr.status != 'pending':
+        return Response(data="You cannot modify this tr", status=status.HTTP_403_FORBIDDEN)
 
     # intercept the policymaker request for modification tr.status is the old status
     if request.user == tr.author and tr.status == 'review' and tr_status == 'farmer':
@@ -214,11 +219,8 @@ def change_status_tip_request(request):
         tr.proposed_title = tr_proposed_title
         tr.proposed_tip = tr_proposed_tip
 
-    tr.status = tr_status
-    tr.save()
-
     # intercept changing od status from review to accepted made by policymakers
-    if request.user == tr.author and tr.status == 'review' and tr.status == 'accepted':
+    if request.user == tr.author and tr_status == 'accepted' and tr.status == 'review':
         tip = Tip(
             title=tr.proposed_title,
             text_body=tr.proposed_tip,
@@ -229,54 +231,28 @@ def change_status_tip_request(request):
         )
         tip.save()
 
+    tr.status = tr_status
+    tr.save()
+
+
     return Response(data="TR status updated", status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 def tr_list_farmer(request):
-    if not request.user.groups.filter(name = "farmer-group").exists():
+    if not request.user.groups.filter(name="farmer-group").exists():
         return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # filter hr by user
     qs_dict = TipRequest.objects.filter(receiver=request.user).values()  # get queryset in dictionary form
-
-    # add extra field to determine if the user is the sender or receiver of the hr
-    if request.user.role != 'farmer':
-        Response(status=status.HTTP_401_UNAUTHORIZED)
 
     return Response(data=qs_dict, status=status.HTTP_200_OK, content_type='application/json')
 
 
 @api_view(['GET'])
 def tr_list_policymaker(request):
-    if not request.user.groups.filter(name = "policymaker-group").exists():
+    if not request.user.groups.filter(name="policymaker-group").exists():
         return Response(data="User not allowed", status=status.HTTP_403_FORBIDDEN)
     # filter hr by user
     qs_dict = TipRequest.objects.filter(author=request.user).values()  # get queryset in dictionary form
 
-    # add extra field to determine if the user is the sender or receiver of the hr
-    if request.user.role != 'policymaker':
-        Response(status=status.HTTP_401_UNAUTHORIZED)
-
     return Response(data=qs_dict, status=status.HTTP_200_OK, content_type='application/json')
-
-
-""" Concrete View Classes
-#CreateAPIView
-Used for create-only endpoints.
-#ListAPIView
-Used for read-only endpoints to represent a collection of model instances.
-#RetrieveAPIView
-Used for read-only endpoints to represent a single model instance.
-#DestroyAPIView
-Used for delete-only endpoints for a single model instance.
-#UpdateAPIView
-Used for update-only endpoints for a single model instance.
-##ListCreateAPIView
-Used for read-write endpoints to represent a collection of model instances.
-RetrieveUpdateAPIView
-Used for read or update endpoints to represent a single model instance.
-#RetrieveDestroyAPIView
-Used for read or delete endpoints to represent a single model instance.
-#RetrieveUpdateDestroyAPIView
-Used for read-write-delete endpoints to represent a single model instance.
-"""
