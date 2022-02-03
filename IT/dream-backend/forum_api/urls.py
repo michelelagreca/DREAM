@@ -28,6 +28,4 @@ urlpatterns = [
 
     path('reading/answers/', answer_list, name='answer_list'),
 
-    path('posting/answer/by-question/<question>', AnswerListQuestion.as_view(), name='answerlistquestion'),
-
 ]

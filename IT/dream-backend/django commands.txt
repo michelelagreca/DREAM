@@ -20,6 +20,7 @@ python manage.py createsuperuser
 pip install django-cors-headers
 
 pip install coverage
+coverage report -m
 coverage run --omit='*/venv/*' manage.py test
 coverage html
 
