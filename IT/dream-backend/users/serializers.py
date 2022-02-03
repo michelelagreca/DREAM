@@ -69,10 +69,10 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Invalid farmer authorization code")
 
         elif data['role'] == roles[1]:
-            try:
+            """try:
                 auth_code_object = AuthCodeAgronomist.objects.get(pk=data['auth_code'])
             except AuthCodeAgronomist.DoesNotExist:
-                raise serializers.ValidationError("Invalid agronomist authorization code")
+                raise serializers.ValidationError("Invalid agronomist authorization code")"""
             raise serializers.ValidationError("Registration for agronomist will be ready soon...")
 
         else:
@@ -109,14 +109,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
         # save password hashed
         user.set_password(validated_data['password'])
+        user.save()
 
         # group association
         if validated_data['role'] == 'farmer':
-            my_group = Group.objects.get(name='farmer-group')
-            my_group.user_set.add(user)
+            my_group, created = Group.objects.get_or_create(name='farmer-group')
+            user.groups.add(my_group)
         elif validated_data['role'] == 'policymaker':
-            my_group = Group.objects.get(name='policymaker-group')
-            my_group.user_set.add(user)
+            my_group, created = Group.objects.get_or_create(name='policymaker-group')
+            user.groups.add(my_group)
 
         user.save()
 
