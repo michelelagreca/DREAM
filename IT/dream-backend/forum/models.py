@@ -67,9 +67,9 @@ class Tip(models.Model):
 
 
 class Answer(models.Model):
-    class AnswerObjects(models.Manager):
-        def get_queryset(self):
-            return super().get_queryset()
+    # class AnswerObjects(models.Manager):
+    #     def get_queryset(self):
+    #         return super().get_queryset()
 
     timestamp = models.DateTimeField(default=timezone.now)
     question = models.ForeignKey(
@@ -80,10 +80,10 @@ class Answer(models.Model):
     likes = models.ManyToManyField(CustomUser, blank=True, related_name='user_likes_answer')
     dislikes = models.ManyToManyField(CustomUser, blank=True, related_name='user_dislikes_answer')
     objects = models.Manager()
-    answerobjects = AnswerObjects()
+    # answerobjects = AnswerObjects()
 
     class Meta:
         ordering = ('-timestamp',)
 
-    # def __str__(self):
-    #     return self.title
+    def __str__(self):
+        return self.text_body

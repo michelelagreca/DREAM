@@ -28,11 +28,11 @@ class FarmerGroupPermission(permissions.BasePermission):
         return True
 
 
-class PolicyMakerGroupPermission(permissions.BasePermission):
+'''class PolicyMakerGroupPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if not request.user.groups.filter(name = "policymaker-group").exists():
             raise PermissionDenied
-        return True
+        return True'''
 
 
 
@@ -41,49 +41,8 @@ class CategoryList(generics.ListAPIView):
     serializer_class = CategorySerializer
 
 
-# GET -> list all questions
-# POST -> inserts a question
 
-# class QuestionDetail(generics.RetrieveAPIView, FarmerGroupPermission):
-#     permission_classes = [FarmerGroupPermission]
-#     queryset = Question.objects.all()
-#     serializer_class = QuestionSerializer
-
-
-# GET + parameter-> retireve a question
-# PUT + parameter-> update the question denoted by the parameter
-# DELETE + parameter-> delete the question denoted by the parameter
-
-
-# class TipList(generics.ListAPIView, FarmerGroupPermission):
-#     permission_classes = [FarmerGroupPermission]
-#     serializer_class = TipSerializer
-
-#     def get_queryset(self):
-#         queryset = Tip.objects.all()
-#         for tip in queryset:
-#             tip.user_like = False
-#             tip.user_dislike = False
-#             if self.request.user in tip.likes.all():
-#                 tip.user_like = True
-#             if self.request.user in tip.dislikes.all():
-#                 tip.user_dislike = True
-#         return queryset
-
-
-# GET -> list all tips
-
-# class TipDetail(generics.RetrieveAPIView, FarmerGroupPermission):
-#     permission_classes = [FarmerGroupPermission]
-#     queryset = Tip.objects.all()
-#     serializer_class = TipSerializer
-
-
-# GET + parameter-> retireve a tip
-# PUT + parameter-> update the tip denoted by the parameter
-# DELETE + parameter-> delete the tip denoted by the parameter
-
-class TipListCategory(generics.ListAPIView, FarmerGroupPermission):
+'''class TipListCategory(generics.ListAPIView, FarmerGroupPermission):
     permission_classes = [FarmerGroupPermission]
     serializer_class = TipSerializer
 
@@ -92,39 +51,14 @@ class TipListCategory(generics.ListAPIView, FarmerGroupPermission):
         return Tip.objects.filter(category=category)
 
 
-# GET + category-> retireve a tip of a specific category
-
-
 class TipListArea(generics.ListAPIView, FarmerGroupPermission):
     permission_classes = [FarmerGroupPermission]
     serializer_class = TipSerializer
 
     def get_queryset(self):
         area = self.kwargs['area']
-        return Tip.objects.filter(area=area)
+        return Tip.objects.filter(area=area)'''
 
-
-# GET + area-> retireve a tip of a specific area
-
-
-# class AnswerList(generics.ListCreateAPIView, FarmerGroupPermission):
-#     permission_classes = [FarmerGroupPermission]
-#     queryset = Answer.answerobjects.all()
-#     serializer_class = AnswerSerializer
-
-
-# GET -> list all answers
-# POST -> inserts a answer
-
-
-# class AnswerDetail(generics.RetrieveAPIView, FarmerGroupPermission):
-#     permission_classes = [FarmerGroupPermission]
-#     queryset = Answer.objects.all()
-#     serializer_class = AnswerSerializer
-
-
-# https://www.django-rest-framework.org/api-guide/requests/
-# DOC django rest HTTP: https://www.django-rest-framework.org/tutorial/2-requests-and-responses/
 
 
 # ------------- FORUM READING -------------
@@ -149,18 +83,17 @@ def answer_list(request):
     # check validation
     if not question_serializer.is_valid():
         return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
-
+    
     # read validated data
     question_id = question_serializer.validated_data["id"]
 
     # get answers
     qs = Answer.objects.filter(question_id=question_id)
     qs_dict = Answer.objects.filter(question_id=question_id).values()
-
+    
     for i in range(len(qs_dict)):  # complete the dictionary with info extracted by the queryset
         qs_dict[i]['user_like'] = False
         qs_dict[i]['user_dislike'] = False
-
         if request.user in qs[i].likes.all():
             qs_dict[i]['user_like'] = True
         if request.user in qs[i].dislikes.all():
@@ -202,12 +135,6 @@ def answer_add(request):
     # pass http request data to custom serializer
     answer_serializer = AnswerSerializer(data=request.data)
 
-    print(request.data)
-    print(answer_serializer.is_valid())
-    # prevent anonymous user to access
-    if request.user.is_anonymous:
-        return Response("Invalid Request", status=status.HTTP_403_FORBIDDEN)
-
     # check validation
     if not answer_serializer.is_valid():
         return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
@@ -239,11 +166,11 @@ def question_add(request):
     if not question_serializer.is_valid():
         return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
 
-    try:
-        category = Category.objects.get(name=question_serializer.validated_data["category"])
-    except Category.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
+    category = Category.objects.get(name=question_serializer.validated_data["category"])
+    # try:
+    #     category = Category.objects.get(name=question_serializer.validated_data["category"])
+    # except Category.DoesNotExist:
+    #     return Response(status=status.HTTP_404_NOT_FOUND)
     # create question instance
     question = Question(
         title=question_serializer.validated_data["title"],
@@ -253,7 +180,6 @@ def question_add(request):
         area=request.user.area,
     )
     question.save()
-
     return Response(data="Question sent", status=status.HTTP_200_OK)
 
 
@@ -268,10 +194,7 @@ def tip_add(request):
     if not tip_serializer.is_valid():
         return Response("Invalid Request", status=status.HTTP_400_BAD_REQUEST)
 
-    try:
-        category = Category.objects.get(pk=tip_serializer.validated_data["category"])
-    except Category.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    category = Category.objects.get(pk=tip_serializer.validated_data["category"])
 
     # create question instance
     tip = Tip(

@@ -1,7 +1,8 @@
 from rest_framework import generics
 from report.models import HarvestReport
 from .serializers import ReportSerializer
-from forum_api.views import FarmerGroupPermission, PolicyMakerGroupPermission
+from forum_api.views import FarmerGroupPermission
+# from forum_api.views import PolicyMakerGroupPermission
 
 # import here all the needed DB models
 # from forum.models import MODEL_NAME
