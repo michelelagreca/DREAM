@@ -88,7 +88,10 @@ class CustomAccountManager(BaseUserManager):
         return self.create_user(email=email, password=password, **other_fields)
 
     def create_user(self, email, role, user_name, first_name, last_name, auth_code, password, **other_fields):
-
+        """
+            function used only for the creation of user in the command line and in testing
+            it allow the creation of non consistent user
+        """
         if not email:
             raise ValueError('You must provide an email address')
         if not user_name:
