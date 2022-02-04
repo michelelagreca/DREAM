@@ -59,7 +59,7 @@ export default function SendPost({type}) {
                 .post(`posting/tip/`, post_obj)
                 .then((res) =>{
                     alert("Tip posted")
-                    navigation('/forum')
+                    navigation('/farmer/forum')
                 })
                 .catch((e)=>alert(e))
 
@@ -68,7 +68,7 @@ export default function SendPost({type}) {
                 .post(`posting/question/`, post_obj)
                 .then((res) =>{
                     alert("Question posted")
-                    navigation('/forum')
+                    navigation('/farmer/forum')
                 })
                 .catch((e)=>alert(e))
     }
@@ -130,8 +130,6 @@ export default function SendPost({type}) {
                 <Stack direction="column" alignItems="flex-end">
                     <Button
                         variant="contained"
-                        component={RouterLink}
-                        to="#"
                         startIcon={<Icon icon={sendFIll} />}
                         onClick={handleSend}
                     >
