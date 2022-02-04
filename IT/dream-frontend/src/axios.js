@@ -34,18 +34,20 @@ axiosInstance.interceptors.response.use(
 
         console.log(error.response.status)
         console.log("original " + originalRequest.url)
+        console.log("original->  " + error.response.data.code)
 
         if (
             error.response.data.code === 'token_not_valid' &&
             error.response.status === 401 &&
             error.response.statusText === 'Unauthorized' &&
-            error.response.baseURL === '/token/refresh/'
+            originalRequest.url === '/token/refresh/'
         ) {
             console.log('@FINAL REJECTION')
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
             axiosInstance.defaults.headers['Authorization'] = null;
-            window.location.href = '/';
+            alert("Login session invalid, please login again")
+            window.location.href = '/login';
             return Promise.reject(error);
         }
 
