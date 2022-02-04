@@ -80,16 +80,14 @@ function AnswerItem({ answer, question, setAnswerData , setPost}) {
 
     return (
 
-        <Stack direction="column" alignItems="flex-start" spacing={2} justifyContent={"space-around"}>
-            <Stack direction="row" alignItems="center">
+        <Stack direction="column" alignItems="flex-start" spacing={2} >
+            <Stack direction="row" alignItems="center" justifyContent="center" sx={{width:"100%"}}>
                 <Icon
                     icon={user_like ? like : user_dislike ? dislike : none}
                     sx={{ width: 48, height: 48, borderRadius: 1.5 }}
                 />
-                <Box sx={{ minWidth: 200, marginLeft:2 }}>
-                    <Typography variant="subtitle1" >
-                        {text_body}
-                    </Typography>
+                <Box sx={{ minWidth: 200, marginLeft:2, width:"100%", marginBottom:1}}>
+                    <TextField style={{width:"100%", marginBottom:"6px"}} rows={4} multiline value={text_body} />
                     <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
                         {new Date(timestamp).toDateString()}
                     </Typography>
@@ -191,7 +189,7 @@ export default function PostDisplayer({isTip, post, setPost, AnswerQ, setData}) 
                     <Card>
                         {/*/selectedHr ? <CardHeader title="Help Request"/> : null*/}
                         {answerData.answer_list ?
-                            <Stack m={2} spacing={3} sx={{p: 3, pr: 0}}>
+                            <Stack m={0} spacing={3} sx={{p: 3, pr: 3}}>
                                 {answerData.answer_list.map((answer,i) => (
                                     <AnswerItem
                                         key={i}
