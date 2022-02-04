@@ -134,6 +134,7 @@ export default function PostDisplayer({isTip, post, setPost, AnswerQ, setData}) 
             .then((res) =>{
                 alert("Answer sent")
                 setAnswerData({loading: true})
+                setNewAnswer("")
             })
             .catch((e)=>alert(e))
     }
