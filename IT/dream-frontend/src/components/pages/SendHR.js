@@ -52,7 +52,7 @@ export default function SendHR({writeQ = false, writeT = false, ShowQ = false,An
     axiosInstance
         .post(`request/sending_hr_farmer/`, post_obj)
         .then((res) =>{
-          alert("HR correctly sent")
+          alert("HR correctly sent, check your help requests, if no HR appears is because we could not find anybody around!")
           console.log(res)
           //navigation('/login')
         })
@@ -100,7 +100,7 @@ export default function SendHR({writeQ = false, writeT = false, ShowQ = false,An
             <Button
                 variant="contained"
                 component={RouterLink}
-                to="#"
+                to="/farmer/incoming-hr"
                 startIcon={<Icon icon={sendFIll} />}
                 onClick={handleSend}
             >
