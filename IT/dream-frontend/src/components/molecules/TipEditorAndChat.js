@@ -177,6 +177,7 @@ const TipEditorAndChat = ({item, setData, canModify, setSelectedTip}) =>{
                     disabled={(canModify && item.status === 'review')|| !canModify || item.status === 'declined' || item.status === 'accepted'}
                     placeholder="Tip content"
                     multiline
+                    inputProps={{ maxLength: 250 }}
                     rows={7}
                     value={tip}
                     onChange={(event)=>setTip(event.target.value)}
