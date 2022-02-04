@@ -87,7 +87,7 @@ function AnswerItem({ answer, question, setAnswerData , setPost}) {
                     sx={{ width: 48, height: 48, borderRadius: 1.5 }}
                 />
                 <Box sx={{ minWidth: 200, marginLeft:2 }}>
-                    <Typography variant="subtitle1" noWrap>
+                    <Typography variant="subtitle1" >
                         {text_body}
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
