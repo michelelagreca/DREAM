@@ -13,18 +13,25 @@ Following instructions are useful to initialize the DREAM project on a local mac
 ● Git is required for cloning the project from GitHub. The git installation procedure
 is available in the following link:
 https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
+
 ● To clone the project from GitHub: git clone
 https://github.com/gccianmario/Zoccheddu-LaGreca-Careddu
+
 # Django installation
 Following instructions are useful to correctly install the Django backend.
+
 ● Python is required. Information about the installation are provided in the following
 link: https://www.python.org/downloads/
+
 ● Firstly, it is necessary to go in the directory using the CMD terminal in Windows:
 ../Zoccheddu-LaGreca-Careddu\IT\dream-backend
+
 ● To install Django:
 pip install django
+
 ● To install Django rest framework:
 pip install djangorestframework
+
 ● To install cors headers:
 pip install django-cors-headers
 ● To install coverage:
