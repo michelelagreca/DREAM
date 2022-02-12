@@ -1,0 +1,2 @@
+The artifacts are available in dream-backend and dream-frontend folder in the root of this directory
+The instruction to deploy them in local are provided in the IT 1.0 document.
