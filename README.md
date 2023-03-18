@@ -1,5 +1,6 @@
 # DREAM - Data-dRiven PrEdictive FArMing in Telangana
-DREAM is the final project for the Software Engineering 2 course of the Computer Science and Engineering Master in Politecnico di Milano held in the accademic year 2021-2022, implemented by me, Gianmario Careddu and Sara Zoccheddu.
+DREAM is the final project for the Software Engineering 2 course of the Computer Science and Engineering Master in Politecnico di Milano held in the accademic year 2021-2022. The goal of the project is building a platform meant to satisfy the needs of farmers, agronomists and policy makers of
+Telangana, by sharing knowledge among farmers, tracking farmers’ production, allowing farmers to get help, supporting agronomist work, providing data-driven decision tools to agronomists and policy makers
 <br> <br> <br> 
 The project is composed of three parts:<br> 
 <br> ● Requirement Analysis and Specification Document (RASD)
@@ -104,5 +105,11 @@ explained.
 <br><br>
 **Chapter 5** provides details on the installation procedure.
 <br><br><br>
+## Group Components
+
+| Cognome | Nome | e-mail | Codice Persona |
+| --- | --- | --- | --- |
+| La Greca  | Michele Carlo | michelecarlo.lagreca@mail.polimi.it |
+| Careddu |  Gianmario | gianmario.careddu@mail.polimi.it |
+| Zoccheddu |  Sara | sara.zoccheddu@mail.polimi.it |
 <br>
-<em> Copyright © 2022, Careddu Gianmario, La Greca Michele Carlo, Zoccheddu Sara – All rights reserved<em/>
