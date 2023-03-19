@@ -103,7 +103,7 @@ backend.
 **Chapter 4** is devoted to the testing part, and structure and procedure are
 explained.
 <br><br>
-**Chapter 5** provides details on the installation procedure.
+**Chapter 5** provides specific details on the installation procedure.
 <br><br><br>
 ## Group Components
 
